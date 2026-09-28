@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Dense Temporal Motion Retargeting for Legged Robots">
+<title>Dense Temporal Motion Retargeting</title>
+<link rel="stylesheet" href="static/bulma.min.css">
+<link rel="stylesheet" href="static/katex/katex.min.css">
+<style>
+body, button, input, select { font-family: "Helvetica Neue", "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, Arial, sans-serif; font-weight:300; color:#222; }
+h1, h2, h3, h4, b, strong, .anon-tag, .vtitle, nav.toc a b, h2.section-title b { font-weight:300 !important; }
+.main-title { font-weight:300; }
+.opener { position:relative; height:100vh; height:100svh; min-height:520px; overflow:hidden; background:linear-gradient(160deg,#e9edf3,#d5dbe6); }
+@media (max-width:600px) { .opener { height:74svh; min-height:420px; } .main-title { font-size:clamp(1.5rem,7.5vw,2.2rem); } .anon-tag { font-size:.85rem; } }
+.opener video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.opener .veil { position:absolute; inset:0; background:linear-gradient(180deg, rgba(255,255,255,.72) 0%, rgba(255,255,255,.25) 45%, rgba(255,255,255,0) 100%); }
+.opener .otitle { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:clamp(7vh,11vh,16vh) 16px 0; text-align:center; }
+.opener .oph { position:absolute; left:50%; bottom:8vh; transform:translateX(-50%); color:#667; font-size:.95rem; background:#fffa; padding:.4em 1em; border-radius:8px; }
+.main-title { font-weight:300; color:#111; font-size:clamp(1.9rem,4.2vw,4.2rem); line-height:1.15; margin:0 0 .35em; letter-spacing:-.01em; }
+.sub-title { font-weight:400; color:#222; font-size:clamp(1.05rem,2vw,1.8rem); line-height:1.35; }
+.anon-tag { display:inline-block; margin-top:1.2em; padding:.5em 1.3em; border-radius:999px; background:#2b2b2f; color:#fff; font-weight:300; font-size:.95rem; }
+nav.toc { position:sticky; top:0; z-index:5; background:#fffd; backdrop-filter:blur(6px); border-bottom:1px solid #e3e3e8; }
+nav.toc .in { max-width:1400px; margin:0 auto; display:flex; gap:6px 18px; flex-wrap:wrap; padding:10px 20px; font-size:.9rem; }
+nav.toc a { color:#333; text-decoration:none; } nav.toc a:hover { color:#0072B2; } nav.toc a b { color:#999; font-weight:600; margin-right:.3em; }
+.section { padding:3.2rem 1.5rem 2.4rem; } .section:nth-of-type(even) { background:#fafbfc; }
+.container.page-w { max-width:1400px !important; width:100%; }
+@media (min-width:1600px) { .container.page-w { max-width:1500px !important; } }
+h2.title.is-2.section-title { text-align:center; font-size:clamp(1.7rem,3.4vw,2.4rem) !important; font-weight:300; letter-spacing:-.01em; margin:0 0 1.2rem; }
+h2.section-title b { color:#aab; font-weight:600; margin-right:.4em; }
+h3.subsec { font-size:clamp(1.15rem,2.2vw,1.5rem); font-weight:300; margin:2rem 0 .7rem; }
+p.lead { max-width:1100px; margin:0 auto 1.2rem; font-size:1.07rem; line-height:1.55; }
+p.note { max-width:1100px; margin:0 auto 1rem; color:#555; font-size:.98rem; }
+.vgrid { display:grid; gap:1.25rem; margin:.6rem 0 1.4rem; }
+.cols1 { grid-template-columns:1fr; } .cols2 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.cols3 { grid-template-columns:repeat(3,minmax(0,1fr)); } .cols4 { grid-template-columns:repeat(4,minmax(0,1fr)); }
+@media (max-width:1100px) { .cols3,.cols4 { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:640px) { .vgrid { grid-template-columns:1fr; } }
+.vcard { display:flex; flex-direction:column; gap:.5rem; }
+.vcard .vtitle { margin:0; text-align:center; font-size:clamp(1rem,1.7vw,1.2rem); font-weight:300; line-height:1.25; display:flex; align-items:center; justify-content:center; }
+.vcard video { width:100%; height:auto; display:block; border-radius:10px; background:#000; }
+.panels { display:flex; gap:4px; } .panels span { flex:1; text-align:center; font-size:.85rem; color:#666; border-bottom:2px solid #e3e3e8; padding-bottom:3px; }
+.vcap { font-size:.92rem; color:#444; margin:0; }
+.vwrap { position:relative; } .vwrap video { position:relative; z-index:0; }
+.ovl { position:absolute; inset:0 0 40px 0; display:grid; pointer-events:none; z-index:1; }
+.ovl span { display:flex; align-items:flex-end; justify-content:center; padding:6px; font-size:.82rem; font-weight:300; color:#333; text-shadow:0 0 6px #fff,0 0 2px #fff; }
+.ovl.top span { align-items:flex-start; } .ovl span.ours { color:#009E73; }
+.ph { aspect-ratio:16/9; display:flex; align-items:center; justify-content:center; text-align:center; border:2px dashed #b9bfd0; border-radius:10px; background:repeating-linear-gradient(45deg,#f3f4f8,#f3f4f8 12px,#eceef4 12px,#eceef4 24px); color:#556; font-size:.95rem; padding:1rem; }
+.ph code { font-size:.8rem; color:#778; } .fig-ph { aspect-ratio:2/1; margin:0 auto; }
+figure.fig { margin:0 auto 1rem; text-align:center; } figure.fig img { display:inline-block; max-width:100%; }
+figure.fig figcaption { font-size:.92rem; color:#444; margin-top:.4rem; }
+.viewer-frame { width:100%; height:min(88vh,860px); border:1px solid #e3e3e8; border-radius:10px; overflow:hidden; background:#fff; }
+.viewer-frame iframe { width:100%; height:100%; border:0; display:block; }
+footer.foot { padding:2rem 1rem 3rem; color:#777; font-size:.9rem; text-align:center; }
+</style>
+</head>
+<body>
+<section class="opener">
+  <video id="opener" autoplay muted loop playsinline preload="auto" data-wide="videos/opener/high_jump_anony.mp4" data-wide-poster="posters/opener__high_jump_anony.jpg" data-tall="videos/opener/high_jump_anony_portrait.mp4" data-tall-poster="posters/opener__high_jump_anony_portrait.jpg"></video><script>(function(){var v=document.getElementById("opener");function pick(){var p=matchMedia("(orientation: portrait)").matches;var s=p?v.dataset.tall:v.dataset.wide;if(v.dataset.cur===s)return;v.dataset.cur=s;v.poster=p?v.dataset.tallPoster:v.dataset.widePoster;v.src=s;v.load();v.play().catch(function(){});}pick();matchMedia("(orientation: portrait)").addEventListener("change",pick);})();</script>
+  <div class="veil"></div>
+  <div class="otitle">
+    <h1 class="main-title">Dense Temporal Motion Retargeting<br>for Legged Robots</h1>
+    <span class="anon-tag">Anonymous submission</span>
+  </div>
+</section>
+<nav class="toc"><div class="in"><a href="#realworld"><b>1</b>Real-world experiments</a><a href="#morphology"><b>2</b>Different morphologies need different timing</a><a href="#dataset"><b>3</b>Two-hour dataset, four humanoids</a><a href="#challenge"><b>4</b>Challenge: timing and control are interdependent</a><a href="#approach"><b>5</b>Approach: jointly optimize timing and control</a><a href="#feasibility"><b>6</b>Dynamic feasibility vs. retargeting baselines</a><a href="#temporal"><b>7</b>Dense vs. segment-wise temporal retargeting</a><a href="#deformation"><b>8</b>Temporal deformation vs. precision</a></div></nav>
+<section class="section" id="realworld"><div class="container page-w"><h2 class="title is-2 section-title"><b>1</b>Real-world experiments</h2><p class="lead">Policies trained on DTMR references, on a Unitree G1 and a Booster K1. Real time.</p><h3 class="subsec">High jump</h3><div class="vgrid cols1"><div class="vcard"><div class="panels"><span>Unitree G1</span><span>Booster K1</span></div><video muted loop playsinline controls preload="none" poster="posters/realworld__high_jump_anony.jpg"><source src="videos/realworld/high_jump_anony.mp4" type="video/mp4"></video></div></div><h3 class="subsec">Side jump</h3><div class="vgrid cols1"><div class="vcard"><div class="panels"><span>Unitree G1</span><span>Booster K1</span></div><video muted loop playsinline controls preload="none" poster="posters/realworld__side-jump-anony.jpg"><source src="videos/realworld/side-jump-anony.mp4" type="video/mp4"></video></div></div><h3 class="subsec">Dance: floss</h3><div class="vgrid cols1"><div class="vcard"><div class="panels"><span>Unitree G1</span><span>Booster K1</span></div><video muted loop playsinline controls preload="none" poster="posters/realworld__dance-floss-anony.jpg"><source src="videos/realworld/dance-floss-anony.mp4" type="video/mp4"></video></div></div></div></section><section class="section" id="morphology"><div class="container page-w"><h2 class="title is-2 section-title"><b>2</b>Different morphologies need different timing</h2><p class="lead">Robots differ in size, mass and actuation, so the same motion needs a different timing on each. DTMR optimizes timing and control jointly, per robot.</p><div class="vgrid cols1"><div class="vcard"><h3 class="vtitle"><span>Source motion · Unitree G1 · Booster K1</span></h3><video muted loop playsinline controls preload="none" poster="posters/morphology__motivation-project-page.jpg"><source src="videos/morphology/motivation-project-page.mp4" type="video/mp4"></video></div></div><h3 class="subsec">Explore</h3><div class="viewer-frame"><iframe src="viewer.html" title="Interactive viewer: one motion, five robots" loading="lazy"></iframe></div></div></section><section class="section" id="dataset"><div class="container page-w"><h2 class="title is-2 section-title"><b>3</b>Two-hour dataset, four humanoids</h2><p class="lead">DTMR transfers arbitrary human motion to arbitrary robots and scales to a dataset: for example, two hours of human motion retargeted to four humanoids. 72 clips per robot, physics rollouts, real time.</p><div class="vgrid cols2"><div class="vcard"><h3 class="vtitle"><span>Unitree G1</span></h3><video muted loop playsinline controls preload="none" poster="posters/dataset__wall_12x6_g1.jpg"><source src="videos/dataset/wall_12x6_g1.mp4" type="video/mp4"></video></div><div class="vcard"><h3 class="vtitle"><span>Unitree R1</span></h3><video muted loop playsinline controls preload="none" poster="posters/dataset__wall_12x6_r1.jpg"><source src="videos/dataset/wall_12x6_r1.mp4" type="video/mp4"></video></div><div class="vcard"><h3 class="vtitle"><span>Unitree H1-2</span></h3><video muted loop playsinline controls preload="none" poster="posters/dataset__wall_12x6_h1_2.jpg"><source src="videos/dataset/wall_12x6_h1_2.mp4" type="video/mp4"></video></div><div class="vcard"><h3 class="vtitle"><span>Booster T1</span></h3><video muted loop playsinline controls preload="none" poster="posters/dataset__wall_12x6_t1.jpg"><source src="videos/dataset/wall_12x6_t1.mp4" type="video/mp4"></video></div></div></div></section><section class="section" id="challenge"><div class="container page-w"><h2 class="title is-2 section-title"><b>4</b>Challenge: timing and control are interdependent</h2><p class="lead">Slowing a motion down changes the control it needs, and vice versa.</p><div class="vgrid cols2"><div class="vcard"><h3 class="vtitle"><span>Reference at the source timing</span></h3><video muted playsinline controls preload="none" data-sync="challenge" poster="posters/challenge__1_source_ref.jpg"><source src="videos/challenge/1_source_ref.mp4" type="video/mp4"></video></div><div class="vcard"><h3 class="vtitle"><span>DTMR reference</span></h3><video muted playsinline controls preload="none" data-sync="challenge" poster="posters/challenge__3_dtmr_ref.jpg"><source src="videos/challenge/3_dtmr_ref.mp4" type="video/mp4"></video></div></div><div class="vgrid cols2"><div class="vcard"><h3 class="vtitle"><span>Policy on the kinematic reference: falls</span></h3><video muted playsinline controls preload="none" data-sync="challenge" poster="posters/challenge__2_source_rollout.jpg"><source src="videos/challenge/2_source_rollout.mp4" type="video/mp4"></video></div><div class="vcard"><h3 class="vtitle"><span>Same policy on the DTMR reference: completes</span></h3><video muted playsinline controls preload="none" data-sync="challenge" poster="posters/challenge__4_dtmr_rollout.jpg"><source src="videos/challenge/4_dtmr_rollout.mp4" type="video/mp4"></video></div></div><h3 class="subsec">Explore</h3><div class="viewer-frame"><iframe src="viewer_challenge.html" title="Interactive: timing and control interdependency" loading="lazy"></iframe></div></div></section><section class="section" id="approach"><div class="container page-w"><h2 class="title is-2 section-title"><b>5</b>Approach: jointly optimize timing and control</h2><p class="lead">The progress through the source motion is one more state and its rate one more action: one sampling-based MPC optimizes timing and control together.</p>
+<style>
+.appr { max-width:1180px; margin:0 auto 1.4rem; }
+.appr .row { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:stretch; }
+.appr .box { background:#fff; border:1px solid #e3e3e8; border-radius:14px; padding:16px 18px 18px; box-shadow:0 2px 10px #0000000a; }
+.appr .box h4 { margin:0 0 10px; font-size:1rem; font-weight:300; text-align:center; color:#333; }
+.appr .plus { display:flex; align-items:center; font-size:2.2rem; color:#666; padding:0 4px; }
+.appr .arrow { text-align:center; font-size:2rem; color:#444; line-height:1; margin:6px 0; }
+.appr .joint { display:grid; grid-template-columns:1.25fr 1fr; gap:18px; align-items:center; background:#f6f7fa; }
+.appr .joint video { width:100%; height:auto; border-radius:10px; display:block; background:#000; }
+.appr .eq { display:flex; flex-direction:column; gap:2px; align-items:center; }
+.appr .tex { font-size:1.15rem; margin:2px 0; } .appr .katex-display { margin:0.35em 0; }
+.appr .timing { color:#E69F00; } .appr .control { color:#0072B2; }
+.appr .cap { text-align:center; color:#555; font-size:.95rem; margin:10px 0 0; }
+@media (max-width:900px) { .appr .row { grid-template-columns:1fr; } .appr .plus { justify-content:center; } .appr .joint { grid-template-columns:1fr; } }
+</style>
+<div class="appr">
+ <div class="row">
+  <div class="box"><h4>Optimal control problem</h4><div class="eq">
+   <div class="tex" data-tex="\begin{aligned} \min_{\textcolor{#0072B2}{\mathbf{u}}}\;&amp; \sum_{k=0}^{T} \big\| \mathrm{FK}(\mathbf{x}_k) - \mathbf{r}_k \big\|^2 \\ \text{s.t.}\;&amp; \mathbf{x}_{k+1} = f(\mathbf{x}_k, \textcolor{#0072B2}{\mathbf{u}}_k) \end{aligned}"></div>
+  </div><p class="cap">Track the reference subject to the dynamics.</p></div>
+  <div class="plus">+</div>
+  <div class="box"><h4>Augmented state and action</h4><div class="eq">
+   <div class="tex" data-tex="\begin{aligned} \tilde{\mathbf{x}}_k &amp;= (\mathbf{x}_k,\, \textcolor{#E69F00}{\phi_k}), \qquad \tilde{\mathbf{u}}_k = (\textcolor{#0072B2}{\mathbf{u}_k},\, \textcolor{#E69F00}{d\phi_k}) \\ 0 &amp;= \textcolor{#E69F00}{\phi_0} \le \textcolor{#E69F00}{\phi_1} \le \cdots \le \textcolor{#E69F00}{\phi_T} = 1 \end{aligned}"></div>
+  </div><p class="cap">Progress <span class="timing">φ</span> becomes a state, its rate an action.</p></div>
+ </div>
+ <div class="arrow">↓</div>
+ <div class="box joint">
+  <div class="eq">
+   <div class="tex" data-tex="\begin{aligned} \min_{\textcolor{#0072B2}{\mathbf{u}},\, \textcolor{#E69F00}{\phi}}\;&amp; \sum_{k=0}^{T} \big\| \mathrm{FK}(\mathbf{x}_k) - \mathbf{r}(\textcolor{#E69F00}{\phi_k}) \big\|^2 \\ \text{s.t.}\;&amp; \mathbf{x}_{k+1} = f(\mathbf{x}_k, \textcolor{#0072B2}{\mathbf{u}}_k) \\ &amp; 0 = \textcolor{#E69F00}{\phi_0} \le \textcolor{#E69F00}{\phi_1} \le \cdots \le \textcolor{#E69F00}{\phi_T} = 1 \end{aligned}"></div>
+   <p class="cap"><span class="control">Control</span> and <span class="timing">timing</span> in one MPC problem.</p>
+  </div>
+  <video muted loop playsinline autoplay preload="metadata" poster="posters/challenge__3_dtmr_ref.jpg"><source src="videos/challenge/3_dtmr_ref.mp4" type="video/mp4"></video>
+ </div>
+</div>
+<h3 class="subsec">High jump: the time warp</h3><p class="note">Both videos run on one wall clock. Left: DTMR in simulation, coloured by its local time-scale: blue where the robot moves slower than the source motion, orange where it moves faster. The translucent ghost is the kinematic reference on the source clock, so the gap between robot and ghost is the time warp. Right: the real Unitree G1 executing the same motion in real time.</p><div class="vgrid cols2"><div class="vcard"><h3 class="vtitle"><span>Simulation, robot clock</span></h3><video muted playsinline controls preload="none" data-sync="timewarp" poster="posters/approach__high_jump_dtmr.jpg"><source src="videos/approach/high_jump_dtmr.mp4" type="video/mp4"></video></div><div class="vcard"><h3 class="vtitle"><span>Real robot, real time</span></h3><video muted playsinline controls preload="none" data-sync="timewarp" poster="posters/approach__high_jump_real_g1.jpg"><source src="videos/approach/high_jump_real_g1.mp4" type="video/mp4"></video></div></div><h3 class="subsec">Explore</h3><div class="viewer-frame"><iframe src="viewer_hero.html" title="Interactive: human on the source clock, robot on its own clock" loading="lazy"></iframe></div></div></section><section class="section" id="feasibility"><div class="container page-w"><h2 class="title is-2 section-title"><b>6</b>Dynamic feasibility vs. retargeting baselines</h2><p class="lead">One tracking policy per retargeter, rolled out on its own references. Orange ghost: reference; solid: policy; DTMR in green.</p><h3 class="subsec">Explore</h3><div class="viewer-frame"><iframe src="viewer_feas.html" title="Interactive: dynamic feasibility rollouts" loading="lazy"></iframe></div></div></section><section class="section" id="temporal"><div class="container page-w"><h2 class="title is-2 section-title"><b>7</b>Dense vs. segment-wise temporal retargeting</h2><p class="lead">The temporal baseline warps a whole segment with one time-scale; DTMR stretches only where the dynamics require it.</p><div class="vgrid cols1"><div class="vcard"><h3 class="vtitle"><span>Flip</span></h3><div class="panels"><span>Source motion (real time)</span><span>Temporal retargeting baseline</span><span>DTMR (ours)</span></div><video muted loop playsinline controls preload="none" poster="posters/temporal__flip_A304.jpg"><source src="videos/temporal/flip_A304.mp4" type="video/mp4"></video><p class="vcap">Source 5.9 s · baseline 11.0 s · DTMR 6.4 s</p></div></div></div></section><section class="section" id="deformation"><div class="container page-w"><h2 class="title is-2 section-title"><b>8</b>Temporal deformation vs. precision</h2><p class="lead">One weight sets how much DTMR may deform the timeline: lower means more deformation and better tracking.</p><div class="viewer-frame"><iframe src="viewer_wdphi.html" title="Interactive: deformation weight ladder" loading="lazy"></iframe></div></div></section>
+<footer class="foot">Anonymous submission. No tracking scripts or external resources.</footer>
+<script src="static/katex/katex.min.js"></script>
+<script>
+document.querySelectorAll('.tex').forEach(function(el){ try { katex.render(el.dataset.tex, el, {displayMode: true, throwOnError: false, trust: false}); } catch (e) { el.textContent = el.dataset.tex; } });
+</script>
+<script>
+(function(){
+  var vids = document.querySelectorAll('section.section video');
+  /* sync groups (data-sync): the members start together, a finished member holds its last frame, all restart when the longest ends */
+  var groups = {};
+  vids.forEach(function(v){ var g = v.dataset.sync; if (!g) return; (groups[g] = groups[g] || []).push(v);
+    v.addEventListener('ended', function(){ var G = groups[g]; if (G.every(function(x){ return x.ended || x.paused && x.currentTime >= x.duration - 0.05; })) restart(G); });
+    /* the controls of any member drive the whole group: play, pause and seek propagate (a member's own echo is a no-op) */
+    v.addEventListener('play', function(){ groups[g].forEach(function(x){ if (x !== v && x.paused && !x.ended) { if (Math.abs(x.currentTime - v.currentTime) > 0.15) x.currentTime = v.currentTime; x.play().catch(function(){}); } }); });
+    v.addEventListener('pause', function(){ if (v.ended) return; groups[g].forEach(function(x){ if (x !== v && !x.paused) x.pause(); }); });
+    v.addEventListener('seeking', function(){ groups[g].forEach(function(x){ if (x !== v && Math.abs(x.currentTime - v.currentTime) > 0.1) x.currentTime = v.currentTime; }); });
+  });
+  function restart(G) { G.forEach(function(x){ x.currentTime = 0; }); G.forEach(function(x){ x.play().catch(function(){}); }); }
+  function playAll(G) { var t = Math.min.apply(null, G.map(function(x){ return x.ended ? 0 : x.currentTime; }));
+    G.forEach(function(x){ if (x.preload === 'none') x.preload = 'auto'; if (x.ended) return; if (Math.abs(x.currentTime - t) > 0.15) x.currentTime = t; x.play().catch(function(){}); }); }
+  var visible = {};
+  var io = new IntersectionObserver(function(es){ es.forEach(function(e){
+    var v = e.target, g = v.dataset.sync;
+    if (g) { visible[g] = visible[g] || new Set(); if (e.isIntersecting) visible[g].add(v); else visible[g].delete(v);
+      if (visible[g].size) playAll(groups[g]); else groups[g].forEach(function(x){ x.pause(); }); return; }
+    if (e.isIntersecting) { if (v.preload === 'none') v.preload = 'auto'; v.play().catch(function(){}); }
+    else v.pause();
+  }); }, {threshold: 0.3});
+  vids.forEach(function(v){ io.observe(v); });
+})();
+</script>
+</body>
+</html>
