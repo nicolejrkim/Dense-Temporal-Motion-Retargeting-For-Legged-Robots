@@ -41,7 +41,7 @@ h1, h2, h3, h4, b, strong, .anon-tag, .vtitle, nav.toc a b, h2.section-title b {
 .lab-logo-rilab { height:120px; }
 @media (max-width:600px) { .lab-logo { height:70px; } .lab-logo-rilab { height:84px; } .lab-foot { gap:2rem 3rem; } }
 .paper-title { font-weight:300 !important; color:#111; font-size:clamp(1.45rem,2.6vw,2.3rem); line-height:1.25; letter-spacing:-.01em; text-align:center; margin:0 0 .7em; max-width:min(34em,100%); text-wrap:balance; }
-.sub-title { font-weight:300; color:#222; font-size:clamp(1.3rem,3vw,2.8rem); line-height:1.3; }
+.sub-title { font-weight:400; color:#222; font-size:clamp(1.05rem,2vw,1.8rem); line-height:1.35; }
 .anon-tag { display:inline-block; margin-top:1.2em; padding:.5em 1.3em; border-radius:999px; background:#2b2b2f; color:#fff; font-weight:300; font-size:.95rem; }
 nav.toc { position:sticky; top:0; z-index:5; background:#fffd; backdrop-filter:blur(6px); border-bottom:1px solid #e3e3e8; }
 nav.toc .in { max-width:1400px; margin:0 auto; display:flex; gap:6px 18px; flex-wrap:wrap; padding:10px 20px; font-size:.9rem; }
@@ -85,8 +85,7 @@ footer.foot { padding:2rem 1rem 3rem; color:#777; font-size:.9rem; text-align:ce
   <video id="opener" autoplay muted loop playsinline preload="auto" data-wide="videos/opener/high_jump.mp4" data-wide-poster="posters/opener__high_jump.jpg" data-tall="videos/opener/high_jump_portrait.mp4" data-tall-poster="posters/opener__high_jump_portrait.jpg"></video><script>(function(){var v=document.getElementById("opener");function pick(){var p=matchMedia("(orientation: portrait)").matches;var s=p?v.dataset.tall:v.dataset.wide;if(v.dataset.cur===s)return;v.dataset.cur=s;v.poster=p?v.dataset.tallPoster:v.dataset.widePoster;v.src=s;v.load();v.play().catch(function(){});}pick();matchMedia("(orientation: portrait)").addEventListener("change",pick);})();</script>
   <div class="veil"></div>
   <div class="otitle">
-    <h1 class="main-title">Dense Temporal Motion Retargeting</h1>
-    <div class="sub-title">for Legged Robots</div>
+    <h1 class="main-title">Dense Temporal Motion Retargeting<br>for Legged Robots</h1>
   </div>
 </section>
 <header class="band">
@@ -101,8 +100,8 @@ footer.foot { padding:2rem 1rem 3rem; color:#777; font-size:.9rem; text-align:ce
     </div>
     <span class="equal-note"><sup>*</sup>Equal contribution</span>
     <div class="logos">
-      <img src="assets/ku.png" alt="Korea University" class="logo-ku">
       <img src="assets/eth.png" alt="ETH Zurich" class="logo-eth">
+      <img src="assets/ku.png" alt="Korea University" class="logo-ku">
     </div>
     <div class="pub-links">
       <a class="pub-btn" href="https://youtu.be/_S1A0e5CaTE" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg><span>YouTube</span></a>
