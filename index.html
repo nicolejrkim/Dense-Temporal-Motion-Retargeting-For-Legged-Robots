@@ -30,7 +30,18 @@ h1, h2, h3, h4, b, strong, .anon-tag, .vtitle, nav.toc a b, h2.section-title b {
 .logo-ku { width:70px; }
 .logo-eth { width:270px; max-width:60vw; }
 @media (max-width:600px) { .byline { padding:.6em 1em .8em; } .authors { gap:.2em 1em; } .logos { gap:1.2rem; } .logo-ku { width:48px; } .logo-eth { width:180px; } }
-.sub-title { font-weight:400; color:#222; font-size:clamp(1.05rem,2vw,1.8rem); line-height:1.35; }
+.pub-links { display:flex; justify-content:center; flex-wrap:wrap; gap:12px; margin-top:1.3em; }
+.pub-btn { display:inline-flex; align-items:center; gap:.5em; padding:.55em 1.3em; border-radius:999px; background:#2b2b2f; color:#fff !important; text-decoration:none; font-size:1rem; font-weight:400; }
+.pub-btn:hover { background:#000; }
+.pub-btn svg { width:1.25em; height:1.25em; }
+.yt-wrap { position:relative; width:min(960px, 92vw); aspect-ratio:16/9; margin-top:1.6em; border-radius:10px; overflow:hidden; border:1px solid #ddd; background:#000; }
+.yt-wrap iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
+.lab-foot { display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:2.5rem 8rem; padding:3rem 16px 3.5rem; border-top:1px solid #eee; }
+.lab-logo { height:100px; width:auto; display:block; }
+.lab-logo-rilab { height:120px; }
+@media (max-width:600px) { .lab-logo { height:70px; } .lab-logo-rilab { height:84px; } .lab-foot { gap:2rem 3rem; } }
+.paper-title { font-weight:300 !important; color:#111; font-size:clamp(1.45rem,2.6vw,2.3rem); line-height:1.25; letter-spacing:-.01em; text-align:center; margin:0 0 .7em; max-width:min(34em,100%); text-wrap:balance; }
+.sub-title { font-weight:300; color:#222; font-size:clamp(1.3rem,3vw,2.8rem); line-height:1.3; }
 .anon-tag { display:inline-block; margin-top:1.2em; padding:.5em 1.3em; border-radius:999px; background:#2b2b2f; color:#fff; font-weight:300; font-size:.95rem; }
 nav.toc { position:sticky; top:0; z-index:5; background:#fffd; backdrop-filter:blur(6px); border-bottom:1px solid #e3e3e8; }
 nav.toc .in { max-width:1400px; margin:0 auto; display:flex; gap:6px 18px; flex-wrap:wrap; padding:10px 20px; font-size:.9rem; }
@@ -74,11 +85,13 @@ footer.foot { padding:2rem 1rem 3rem; color:#777; font-size:.9rem; text-align:ce
   <video id="opener" autoplay muted loop playsinline preload="auto" data-wide="videos/opener/high_jump.mp4" data-wide-poster="posters/opener__high_jump.jpg" data-tall="videos/opener/high_jump_portrait.mp4" data-tall-poster="posters/opener__high_jump_portrait.jpg"></video><script>(function(){var v=document.getElementById("opener");function pick(){var p=matchMedia("(orientation: portrait)").matches;var s=p?v.dataset.tall:v.dataset.wide;if(v.dataset.cur===s)return;v.dataset.cur=s;v.poster=p?v.dataset.tallPoster:v.dataset.widePoster;v.src=s;v.load();v.play().catch(function(){});}pick();matchMedia("(orientation: portrait)").addEventListener("change",pick);})();</script>
   <div class="veil"></div>
   <div class="otitle">
-    <h1 class="main-title">Dense Temporal Motion Retargeting<br>for Legged Robots</h1>
+    <h1 class="main-title">Dense Temporal Motion Retargeting</h1>
+    <div class="sub-title">for Legged Robots</div>
   </div>
 </section>
 <header class="band">
     <div class="byline byline-flat">
+    <h2 class="paper-title">Dense Temporal Motion Retargeting for Legged Robots</h2>
     <div class="authors">
       <a href="https://jaeryeongnicolekim.com/">Jaeryeong Kim<sup>*</sup></a>
       <a href="https://taerimyoon.me/">Taerim Yoon<sup>*</sup></a>
@@ -90,6 +103,12 @@ footer.foot { padding:2rem 1rem 3rem; color:#777; font-size:.9rem; text-align:ce
     <div class="logos">
       <img src="assets/ku.png" alt="Korea University" class="logo-ku">
       <img src="assets/eth.png" alt="ETH Zurich" class="logo-eth">
+    </div>
+    <div class="pub-links">
+      <a class="pub-btn" href="https://youtu.be/_S1A0e5CaTE" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg><span>YouTube</span></a>
+    </div>
+    <div class="yt-wrap">
+      <iframe src="https://www.youtube-nocookie.com/embed/_S1A0e5CaTE" title="Dense Temporal Motion Retargeting for Legged Robots (video)" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
     </div>
     </div>
 </header>
@@ -130,7 +149,7 @@ footer.foot { padding:2rem 1rem 3rem; color:#777; font-size:.9rem; text-align:ce
  </div>
 </div>
 <h3 class="subsec">High jump: the time warp</h3><p class="note">Both videos run on one wall clock. Left: DTMR in simulation, coloured by its local time-scale: blue where the robot moves slower than the source motion, orange where it moves faster. The translucent ghost is the kinematic reference on the source clock, so the gap between robot and ghost is the time warp. Right: the real Unitree G1 executing the same motion in real time.</p><div class="vgrid cols2"><div class="vcard"><h3 class="vtitle"><span>Simulation, robot clock</span></h3><video muted playsinline controls preload="none" data-sync="timewarp" poster="posters/approach__high_jump_dtmr.jpg"><source src="videos/approach/high_jump_dtmr.mp4" type="video/mp4"></video></div><div class="vcard"><h3 class="vtitle"><span>Real robot, real time</span></h3><video muted playsinline controls preload="none" data-sync="timewarp" poster="posters/approach__high_jump_real_g1.jpg"><source src="videos/approach/high_jump_real_g1.mp4" type="video/mp4"></video></div></div><h3 class="subsec">Explore</h3><div class="viewer-frame"><iframe src="viewer_hero.html" title="Interactive: human on the source clock, robot on its own clock" loading="lazy"></iframe></div></div></section><section class="section" id="feasibility"><div class="container page-w"><h2 class="title is-2 section-title"><b>6</b>Dynamic feasibility vs. retargeting baselines</h2><p class="lead">One tracking policy per retargeter, rolled out on its own references. Orange ghost: reference; solid: policy; DTMR in green.</p><h3 class="subsec">Explore</h3><div class="viewer-frame"><iframe src="viewer_feas.html" title="Interactive: dynamic feasibility rollouts" loading="lazy"></iframe></div></div></section><section class="section" id="temporal"><div class="container page-w"><h2 class="title is-2 section-title"><b>7</b>Dense vs. segment-wise temporal retargeting</h2><p class="lead">The temporal baseline warps a whole segment with one time-scale; DTMR stretches only where the dynamics require it.</p><div class="vgrid cols1"><div class="vcard"><h3 class="vtitle"><span>Flip</span></h3><div class="panels"><span>Source motion (real time)</span><span>Temporal retargeting baseline</span><span>DTMR (ours)</span></div><video muted loop playsinline controls preload="none" poster="posters/temporal__flip_A304.jpg"><source src="videos/temporal/flip_A304.mp4" type="video/mp4"></video><p class="vcap">Source 5.9 s · baseline 11.0 s · DTMR 6.4 s</p></div></div></div></section><section class="section" id="deformation"><div class="container page-w"><h2 class="title is-2 section-title"><b>8</b>Temporal deformation vs. precision</h2><p class="lead">One weight sets how much DTMR may deform the timeline: lower means more deformation and better tracking.</p><div class="viewer-frame"><iframe src="viewer_wdphi.html" title="Interactive: deformation weight ladder" loading="lazy"></iframe></div></div></section>
-<footer class="foot">No tracking scripts or external resources.</footer>
+
 <script src="static/katex/katex.min.js"></script>
 <script>
 document.querySelectorAll('.tex').forEach(function(el){ try { katex.render(el.dataset.tex, el, {displayMode: true, throwOnError: false, trust: false}); } catch (e) { el.textContent = el.dataset.tex; } });
@@ -161,5 +180,9 @@ document.querySelectorAll('.tex').forEach(function(el){ try { katex.render(el.da
   vids.forEach(function(v){ io.observe(v); });
 })();
 </script>
+<footer class="foot lab-foot">
+  <a href="https://crl.ethz.ch" target="_blank" rel="noopener"><img src="assets/crl.svg" alt="Computational Robotics Lab, ETH Zurich" class="lab-logo"></a>
+  <img src="assets/rilab.png" alt="Robot Intelligence Lab, Korea University" class="lab-logo lab-logo-rilab">
+</footer>
 </body>
 </html>
