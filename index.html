@@ -4,7 +4,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="canonical" href="https://jaeryeongnicolekim.com/Dense-Temporal-Motion-Retargeting-For-Legged-Robots/">
-<meta name="description" content="Dense Temporal Motion Retargeting for Legged Robots">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Dense Temporal Motion Retargeting for Legged Robots">
+<meta property="og:description" content="DTMR jointly optimizes the timing and the control of a reference motion for every control step with sampling-based MPC on a GPU, so legged robots can track dynamic human and animal motions. Evaluated on two hours of human motion with four humanoids and transferred to a real robot.">
+<meta property="og:url" content="https://jaeryeongnicolekim.com/Dense-Temporal-Motion-Retargeting-For-Legged-Robots/">
+<meta property="og:image" content="https://jaeryeongnicolekim.com/Dense-Temporal-Motion-Retargeting-For-Legged-Robots/posters/opener__high_jump.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Dense Temporal Motion Retargeting for Legged Robots">
+<meta name="twitter:description" content="DTMR jointly optimizes the timing and the control of a reference motion for every control step with sampling-based MPC on a GPU, so legged robots can track dynamic human and animal motions. Evaluated on two hours of human motion with four humanoids and transferred to a real robot.">
+<meta name="twitter:image" content="https://jaeryeongnicolekim.com/Dense-Temporal-Motion-Retargeting-For-Legged-Robots/posters/opener__high_jump.jpg">
+<meta name="citation_title" content="Dense Temporal Motion Retargeting for Legged Robots">
+<meta name="citation_author" content="Kim, Jaeryeong">
+<meta name="citation_author" content="Yoon, Taerim">
+<meta name="citation_author" content="Cheng, Jin">
+<meta name="citation_author" content="Choi, Sungjoon">
+<meta name="citation_author" content="Coros, Stelian">
+<meta name="citation_publication_date" content="2026/09/29">
+<meta name="citation_arxiv_id" content="2609.38617">
+<meta name="citation_pdf_url" content="https://arxiv.org/pdf/2609.38617">
+<meta name="description" content="DTMR jointly optimizes the timing and the control of a reference motion for every control step with sampling-based MPC on a GPU, so legged robots can track dynamic human and animal motions. Evaluated on two hours of human motion with four humanoids and transferred to a real robot.">
 <title>Dense Temporal Motion Retargeting</title>
 <link rel="stylesheet" href="static/bulma.min.css">
 <link rel="stylesheet" href="static/katex/katex.min.css">
@@ -32,6 +50,12 @@ h1, h2, h3, h4, b, strong, .anon-tag, .vtitle, nav.toc a b, h2.section-title b {
 .logo-ku { width:70px; }
 .logo-eth { width:270px; max-width:60vw; }
 @media (max-width:600px) { .byline { padding:.6em 1em .8em; } .authors { gap:.2em 1em; } .logos { gap:1.2rem; } .logo-ku { width:48px; } .logo-eth { width:180px; } }
+.abstract-wrap, .bibtex-wrap { max-width:980px; margin:0 auto; padding:2.6rem 1.5rem 1.2rem; }
+.abs-title { text-align:center; font-size:clamp(1.5rem,3vw,2.1rem); font-weight:300; letter-spacing:-.01em; margin:0 0 .9rem; }
+.abs-text { font-size:1.07rem; line-height:1.6; color:#222; text-align:justify; margin:0 0 .7rem; }
+.abs-links { text-align:center; color:#555; font-size:.95rem; } .abs-links a { color:#2a6bdb; text-decoration:none; }
+pre.bibtex { background:#f6f7fa; border:1px solid #e3e3e8; border-radius:12px; padding:1rem 1.2rem; font-size:.88rem; line-height:1.45; overflow-x:auto; white-space:pre; }
+.bibtex-wrap { padding-bottom:2.4rem; }
 .pub-links { display:flex; justify-content:center; flex-wrap:wrap; gap:12px; margin-top:1.3em; }
 .pub-btn { display:inline-flex; align-items:center; gap:.5em; padding:.55em 1.3em; border-radius:999px; background:#2b2b2f; color:#fff !important; text-decoration:none; font-size:1rem; font-weight:400; }
 .pub-btn:hover { background:#000; }
@@ -108,13 +132,24 @@ footer.foot { padding:2rem 1rem 3rem; color:#777; font-size:.9rem; text-align:ce
     </div>
     <div class="pub-links">
       <a class="pub-btn" href="https://youtu.be/_S1A0e5CaTE" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg><span>YouTube</span></a>
+      <a class="pub-btn" href="https://arxiv.org/pdf/2609.38617" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 2h8l6 6v14H6zm7 1.5V9h5.5zM8 12h8v1.5H8zm0 3.5h8V17H8zm0 3.5h5v1.5H8z"/></svg>Paper</a>
+      <a class="pub-btn" href="https://arxiv.org/abs/2609.38617" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 4h16v2H4zm0 7h16v2H4zm0 7h10v2H4z"/></svg>arXiv</a>
+      <!-- Code button: uncomment when github.com/nicolejrkim/DTMR is public
+      <a class="pub-btn" href="https://github.com/nicolejrkim/DTMR" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8.7 7.3 4 12l4.7 4.7 1.4-1.4L6.8 12l3.3-3.3zm6.6 0-1.4 1.4 3.3 3.3-3.3 3.3 1.4 1.4L20 12z"/></svg>Code</a>
+      -->
+      <a class="pub-btn" href="#bibtex"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 6h4v6H8.5c0 1.5 1 2.5 2.5 2.5V17c-3 0-5-2-5-5zm9 0h4v6h-2.5c0 1.5 1 2.5 2.5 2.5V17c-3 0-5-2-5-5z"/></svg>BibTeX</a>
     </div>
     <div class="yt-wrap">
       <iframe src="https://www.youtube-nocookie.com/embed/_S1A0e5CaTE" title="Dense Temporal Motion Retargeting for Legged Robots (video)" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
     </div>
     </div>
 </header>
-<nav class="toc"><div class="in"><a href="#realworld"><b>1</b>Real-world experiments</a><a href="#morphology"><b>2</b>Different morphologies need different timing</a><a href="#dataset"><b>3</b>Two-hour dataset, four humanoids</a><a href="#challenge"><b>4</b>Challenge: timing and control are interdependent</a><a href="#approach"><b>5</b>Approach: jointly optimize timing and control</a><a href="#feasibility"><b>6</b>Dynamic feasibility vs. retargeting baselines</a><a href="#temporal"><b>7</b>Dense vs. segment-wise temporal retargeting</a><a href="#deformation"><b>8</b>Temporal deformation vs. precision</a></div></nav>
+<div class="abstract-wrap" id="abstract">
+  <h2 class="abs-title">Abstract</h2>
+  <p class="abs-text">Legged robots can learn expressive whole-body skills from the motions of humans and animals. Due to the morphology gap between the source and the robot, however, the motion must be tailored to the dynamic properties of the robot. In particular, dynamic motions such as a jump require careful adjustment, since their timing and control are interdependent. We propose dense temporal motion retargeting (DTMR), which jointly optimizes timing and control within a single optimization, where dense means that the timing is adjusted for every control step. This dense formulation enables DTMR to deform only the parts of the motion that need a change in timing. The problem is solved with sampling-based model predictive control (MPC) in parallel on a GPU. We evaluate DTMR against baselines on two hours of human motion with four humanoid robots, where the results show that DTMR outperforms baseline methods, particularly on dynamic motions. We also show that allowing more temporal deformation yields more precise retargeting. We further compare DTMR with a baseline that optimizes the temporal dimension, where the result shows that DTMR retargets more precisely under the same deformation budget while being about 19&times; faster. Lastly, policies trained on our references transfer to a real humanoid robot.</p>
+  <p class="abs-links"><a href="https://arxiv.org/abs/2609.38617" target="_blank" rel="noopener">arXiv:2609.38617</a> &middot; cs.RO &middot; 8 pages</p>
+</div>
+<nav class="toc"><div class="in"><a href="#realworld"><b>1</b>Real-world experiments</a><a href="#morphology"><b>2</b>Different morphologies need different timing</a><a href="#dataset"><b>3</b>Two-hour dataset, four humanoids</a><a href="#challenge"><b>4</b>Challenge: timing and control are interdependent</a><a href="#approach"><b>5</b>Approach: jointly optimize timing and control</a><a href="#feasibility"><b>6</b>Dynamic feasibility vs. retargeting baselines</a><a href="#temporal"><b>7</b>Dense vs. segment-wise temporal retargeting</a><a href="#deformation"><b>8</b>Temporal deformation vs. precision</a><a href="#bibtex">BibTeX</a></div></nav>
 <section class="section" id="realworld"><div class="container page-w"><h2 class="title is-2 section-title"><b>1</b>Real-world experiments</h2><p class="lead">Policies trained on DTMR references, on a Unitree G1 and a Booster K1. Real time.</p><h3 class="subsec">High jump</h3><div class="vgrid cols1"><div class="vcard"><div class="panels"><span>Unitree G1</span><span>Booster K1</span></div><video muted loop playsinline controls preload="none" poster="posters/realworld__high_jump.jpg"><source src="videos/realworld/high_jump.mp4" type="video/mp4"></video></div></div><h3 class="subsec">Side jump</h3><div class="vgrid cols1"><div class="vcard"><div class="panels"><span>Unitree G1</span><span>Booster K1</span></div><video muted loop playsinline controls preload="none" poster="posters/realworld__side_jump.jpg"><source src="videos/realworld/side_jump.mp4" type="video/mp4"></video></div></div><h3 class="subsec">Dance: floss</h3><div class="vgrid cols1"><div class="vcard"><div class="panels"><span>Unitree G1</span><span>Booster K1</span></div><video muted loop playsinline controls preload="none" poster="posters/realworld__dance_floss.jpg"><source src="videos/realworld/dance_floss.mp4" type="video/mp4"></video></div></div></div></section><section class="section" id="morphology"><div class="container page-w"><h2 class="title is-2 section-title"><b>2</b>Different morphologies need different timing</h2><p class="lead">Robots differ in size, mass and actuation, so the same motion needs a different timing on each. DTMR optimizes timing and control jointly, per robot.</p><div class="vgrid cols1"><div class="vcard"><h3 class="vtitle"><span>Source motion · Unitree G1 · Booster K1</span></h3><video muted loop playsinline controls preload="none" poster="posters/morphology__motivation-project-page.jpg"><source src="videos/morphology/motivation-project-page.mp4" type="video/mp4"></video></div></div><h3 class="subsec">Explore</h3><div class="viewer-frame"><iframe src="viewer.html" title="Interactive viewer: one motion, five robots" loading="lazy"></iframe></div></div></section><section class="section" id="dataset"><div class="container page-w"><h2 class="title is-2 section-title"><b>3</b>Two-hour dataset, four humanoids</h2><p class="lead">DTMR transfers arbitrary human motion to arbitrary robots and scales to a dataset: for example, two hours of human motion retargeted to four humanoids. 72 clips per robot, physics rollouts, real time.</p><div class="vgrid cols2"><div class="vcard"><h3 class="vtitle"><span>Unitree G1</span></h3><video muted loop playsinline controls preload="none" poster="posters/dataset__wall_12x6_g1.jpg"><source src="videos/dataset/wall_12x6_g1.mp4" type="video/mp4"></video></div><div class="vcard"><h3 class="vtitle"><span>Unitree R1</span></h3><video muted loop playsinline controls preload="none" poster="posters/dataset__wall_12x6_r1.jpg"><source src="videos/dataset/wall_12x6_r1.mp4" type="video/mp4"></video></div><div class="vcard"><h3 class="vtitle"><span>Unitree H1-2</span></h3><video muted loop playsinline controls preload="none" poster="posters/dataset__wall_12x6_h1_2.jpg"><source src="videos/dataset/wall_12x6_h1_2.mp4" type="video/mp4"></video></div><div class="vcard"><h3 class="vtitle"><span>Booster T1</span></h3><video muted loop playsinline controls preload="none" poster="posters/dataset__wall_12x6_t1.jpg"><source src="videos/dataset/wall_12x6_t1.mp4" type="video/mp4"></video></div></div></div></section><section class="section" id="challenge"><div class="container page-w"><h2 class="title is-2 section-title"><b>4</b>Challenge: timing and control are interdependent</h2><p class="lead">Slowing a motion down changes the control it needs, and vice versa.</p><div class="vgrid cols2"><div class="vcard"><h3 class="vtitle"><span>Reference at the source timing</span></h3><video muted playsinline controls preload="none" data-sync="challenge" poster="posters/challenge__1_source_ref.jpg"><source src="videos/challenge/1_source_ref.mp4" type="video/mp4"></video></div><div class="vcard"><h3 class="vtitle"><span>DTMR reference</span></h3><video muted playsinline controls preload="none" data-sync="challenge" poster="posters/challenge__3_dtmr_ref.jpg"><source src="videos/challenge/3_dtmr_ref.mp4" type="video/mp4"></video></div></div><div class="vgrid cols2"><div class="vcard"><h3 class="vtitle"><span>Policy on the kinematic reference: falls</span></h3><video muted playsinline controls preload="none" data-sync="challenge" poster="posters/challenge__2_source_rollout.jpg"><source src="videos/challenge/2_source_rollout.mp4" type="video/mp4"></video></div><div class="vcard"><h3 class="vtitle"><span>Same policy on the DTMR reference: completes</span></h3><video muted playsinline controls preload="none" data-sync="challenge" poster="posters/challenge__4_dtmr_rollout.jpg"><source src="videos/challenge/4_dtmr_rollout.mp4" type="video/mp4"></video></div></div><h3 class="subsec">Explore</h3><div class="viewer-frame"><iframe src="viewer_challenge.html" title="Interactive: timing and control interdependency" loading="lazy"></iframe></div></div></section><section class="section" id="approach"><div class="container page-w"><h2 class="title is-2 section-title"><b>5</b>Approach: jointly optimize timing and control</h2><p class="lead">The progress through the source motion is one more state and its rate one more action: one sampling-based MPC optimizes timing and control together.</p>
 <style>
 .appr { max-width:1180px; margin:0 auto 1.4rem; }
@@ -182,6 +217,18 @@ document.querySelectorAll('.tex').forEach(function(el){ try { katex.render(el.da
   vids.forEach(function(v){ io.observe(v); });
 })();
 </script>
+<div class="bibtex-wrap" id="bibtex">
+  <h2 class="abs-title">Citation</h2>
+  <pre class="bibtex">@misc{kim2026dtmr,
+  title         = {Dense Temporal Motion Retargeting for Legged Robots},
+  author        = {Kim, Jaeryeong and Yoon, Taerim and Cheng, Jin and Choi, Sungjoon and Coros, Stelian},
+  year          = {2026},
+  eprint        = {2609.38617},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.RO},
+  url           = {https://arxiv.org/abs/2609.38617}
+}</pre>
+</div>
 <footer class="foot lab-foot">
   <a href="https://crl.ethz.ch" target="_blank" rel="noopener"><img src="assets/crl.svg" alt="Computational Robotics Lab, ETH Zurich" class="lab-logo"></a>
   <img src="assets/rilab.png" alt="Robot Intelligence Lab, Korea University" class="lab-logo lab-logo-rilab">
