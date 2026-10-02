@@ -29,6 +29,7 @@
   .cards .cell .ct { position:absolute; left:0; right:0; bottom:7px; text-align:center; font-size:clamp(11px, 1.4vw, 15px); color:var(--ink); }
   .stage.cardsmode .legend { top:auto; bottom:8px; right:12px; flex-direction:row; flex-wrap:wrap; justify-content:flex-end; max-width:72%; gap:5px; }
   .stage.cardsmode .hint { bottom:12px; max-width:26%; line-height:1.35; }
+  .stage.cardsmode .legend { display:none; }                /* cards: every subject is always shown, no toggles */
   @media (max-width:900px) { .cards.wide { grid-template-columns:repeat(3, 1fr) !important; grid-template-rows:none !important; grid-auto-rows:1fr; } }
   @media (max-width:640px) { .cards { grid-template-columns:repeat(2, 1fr) !important; grid-template-rows:none !important; grid-auto-rows:1fr; } }
   .hint { position:absolute; left:12px; bottom:10px; font-family:var(--font-mono); font-size:10.5px; color:var(--muted); pointer-events:none; }
@@ -407,6 +408,7 @@ const CARDS = META.cards || null, cardsEl = $("cards"), cellEls = [];
 let cardsOn = !!(CARDS && CARDS.default !== "row");
 function setLayout(cards) {
   cardsOn = !!CARDS && cards; cardsEl.hidden = !cardsOn; stage.classList.toggle("cardsmode", cardsOn);
+  if (cardsOn) { for (const k in show) show[k] = true; refreshChips(); }   // a body hidden in one-scene view comes back when its card does
   $("layoutRow").setAttribute("aria-pressed", String(!cardsOn)); $("layoutCards").setAttribute("aria-pressed", String(cardsOn));
   controls.enablePan = !cardsOn; if (cur) frameCamera();
 }
