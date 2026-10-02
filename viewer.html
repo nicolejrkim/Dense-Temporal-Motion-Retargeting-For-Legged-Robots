@@ -29,6 +29,7 @@
   .cards .cell .ct { position:absolute; left:0; right:0; bottom:7px; text-align:center; font-size:clamp(11px, 1.4vw, 15px); color:var(--ink); }
   .stage.cardsmode .legend { top:auto; bottom:8px; right:12px; flex-direction:row; flex-wrap:wrap; justify-content:flex-end; max-width:72%; gap:5px; }
   .stage.cardsmode .hint { bottom:12px; max-width:26%; line-height:1.35; }
+  @media (max-width:900px) { .cards.wide { grid-template-columns:repeat(3, 1fr) !important; grid-template-rows:none !important; grid-auto-rows:1fr; } }
   @media (max-width:640px) { .cards { grid-template-columns:repeat(2, 1fr) !important; grid-template-rows:none !important; grid-auto-rows:1fr; } }
   .hint { position:absolute; left:12px; bottom:10px; font-family:var(--font-mono); font-size:10.5px; color:var(--muted); pointer-events:none; }
   .loading { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:12px; color:var(--muted); pointer-events:none; }
@@ -412,6 +413,7 @@ function setLayout(cards) {
 if (CARDS) {
   $("layoutSeg").hidden = false; $("layoutRow").addEventListener("click", () => setLayout(false)); $("layoutCards").addEventListener("click", () => setLayout(true));
   stage.classList.toggle("cardsmode", cardsOn); cardsEl.hidden = !cardsOn; $("layoutRow").setAttribute("aria-pressed", String(!cardsOn)); $("layoutCards").setAttribute("aria-pressed", String(cardsOn));
+  if ((CARDS.cols || 3) >= 4) cardsEl.classList.add("wide");   // many columns: reflow to 3 on narrow screens
   cardsEl.style.gridTemplateColumns = "repeat(" + (CARDS.cols || 3) + ", 1fr)";
   cardsEl.style.gridTemplateRows = "repeat(" + Math.ceil(CARDS.cells.length / (CARDS.cols || 3)) + ", 1fr)";
   for (const id of CARDS.cells) { const d = document.createElement("div"); d.className = "cell"; const ti = document.createElement("div"); ti.className = "ct";
