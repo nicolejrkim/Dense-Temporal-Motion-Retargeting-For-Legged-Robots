@@ -177,7 +177,7 @@ function makeLabel(spec) {
 }
 
 /* ---------- build ---------- */
-let A, S, cur, t = 0, meshes = {}, labels = {}, humanMesh = null, humanGeo = null, PELVIS = [];
+let A, S, cur, t = 0, meshes = {}, labels = {}, humanMesh = null, humanDepth = null, humanGeo = null, PELVIS = [];
 const SV = META.somaVerts, SJ = META.somaJoints;
 function tintColors(cols, tint, amt) {          // vertex colour mix used by the classic viewer: mix(c, tint*luma, amt)
   const out = new Float32Array(cols.length);
@@ -217,6 +217,9 @@ function buildEntities() {
   humanGeo.computeVertexNormals();
   const hal = (META.alpha || {}).human; const hm = new THREE.MeshStandardMaterial({ color: cssColor("--human"), roughness: 0.7, metalness: 0.0, transparent: hal !== undefined && hal < 1, opacity: hal === undefined ? 1 : hal });
   humanMesh = new THREE.Mesh(humanGeo, hm); humanMesh.castShadow = true; humanMesh.frustumCulled = false; humanMesh.visible = false; scene.add(humanMesh);
+  /* depth pre-pass for the translucent human: writes depth only, so the inner mouth / eye geometry is hidden behind the skin instead of showing through */
+  humanDepth = new THREE.Mesh(humanGeo, new THREE.MeshBasicMaterial({ colorWrite: false })); humanDepth.frustumCulled = false; humanDepth.renderOrder = -1; humanDepth.visible = false; scene.add(humanDepth);
+  humanMesh.renderOrder = 0;
   labels.human = makeLabel("Human"); labels.human.visible = false; scene.add(labels.human);
   buildLaneLabels(null);
 }
@@ -376,8 +379,8 @@ function render(ts) {
   for (const k in laneLabels) laneLabels[k].visible = false;
   const fadeDone = (mat, base, done) => { const o = done ? Math.min(base, 0.3) : base; if (mat.opacity !== o) { mat.opacity = o; mat.transparent = o < 1; mat.depthWrite = o >= 1; mat.needsUpdate = true; } };
   fadeDone(humanMesh.material, (META.alpha || {}).human == null ? 1 : META.alpha.human, cur.humanF < cur.F - 1 && t * FPS >= cur.humanF - 1);
-  humanMesh.visible = ents.includes("human"); labels.human.visible = humanMesh.visible && sideBySide && !useLane && !cardsOn;
-  if (humanMesh.visible) { skinSoma(t); humanMesh.position.set(...offs.human); rootXY.human = [offs.human[0] + JT[0], offs.human[1] + JT[1]]; labels.human.position.set(rootXY.human[0], rootXY.human[1], labelZ("human")); }
+  humanMesh.visible = ents.includes("human"); humanDepth.visible = humanMesh.visible && humanMesh.material.transparent; humanDepth.layers.mask = humanMesh.layers.mask; labels.human.visible = humanMesh.visible && sideBySide && !useLane && !cardsOn;
+  if (humanMesh.visible) { skinSoma(t); humanMesh.position.set(...offs.human); humanDepth.position.copy(humanMesh.position); rootXY.human = [offs.human[0] + JT[0], offs.human[1] + JT[1]]; labels.human.position.set(rootXY.human[0], rootXY.human[1], labelZ("human")); }
   for (const rt of META.retargeters) {
     const E = meshes[rt], on = ents.includes(rt); E.group.visible = on; labels[rt].visible = on && sideBySide; if (!on) continue;
     const tr = cur.rts[rt]; E.group.position.set(...offs[rt]);
