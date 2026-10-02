@@ -411,6 +411,11 @@ if (CARDS) {
   controls.enablePan = !cardsOn; controls.minDistance = 1.2; controls.maxDistance = 60;
 }
 const camOff = new THREE.Vector3(), anchor = new THREE.Vector3(), anchorS = {}; let anchorReset = true, anchorLastT = 0;
+function applyCardLayers() {                               // each card's subjects live on their own layer: a card camera never sees (or shadows) its neighbours
+  if (!CARDS) return;
+  CARDS.cells.forEach((id, i) => { for (const e of cellMembers(id)) { if (e === "human") humanMesh.layers.set(1 + i); else if (meshes[e]) meshes[e].group.traverse((o) => o.layers.set(1 + i)); } });
+  camera.layers.enableAll();
+}
 function cellMembers(id) {                                   // a cell is an entity or a lane (META.groups value): all its entities share the cell
   if (id === "human") return ["human"]; const G = META.groups || {}, mem = [];
   for (const rt of META.retargeters) if ((G[rt] || rt) === id) mem.push(rt); return mem.length ? mem : [id];
@@ -435,14 +440,15 @@ function renderCards(rootXY, ents, offs) {
     const prev = anchorS[id]; if (prev && !anchorReset) base = [prev[0] + (base[0] - prev[0]) * 0.22, prev[1] + (base[1] - prev[1]) * 0.22]; anchorS[id] = base;
     anchor.set(base[0], base[1], lookZ); floorMat.uniforms.uCenter.value.set(base[0], base[1]);
     camera.aspect = w / hh; camera.updateProjectionMatrix(); camera.position.copy(anchor).add(camOff); camera.lookAt(anchor);
+    camera.layers.set(0); camera.layers.enable(1 + i);
     renderer.render(scene, camera);
   });
-  anchorReset = false;
+  anchorReset = false; camera.layers.enableAll();
   renderer.setScissorTest(false); renderer.autoClear = true; renderer.setViewport(0, 0, W, H);
   camera.position.copy(controls.target).add(camOff); camera.aspect = W / Math.max(1, H); camera.updateProjectionMatrix();
 }
 (async () => {
-  try { A = await decodeBlob(); buildEntities(); await setMotion(0); $("loading").style.display = "none"; setPlaying(playing); requestAnimationFrame(render); }
+  try { A = await decodeBlob(); buildEntities(); applyCardLayers(); await setMotion(0); $("loading").style.display = "none"; setPlaying(playing); requestAnimationFrame(render); }
   catch (e) { $("loading").textContent = "Failed to load the 3D view (" + e + ")."; console.error(e); }
 })();
 </script>
