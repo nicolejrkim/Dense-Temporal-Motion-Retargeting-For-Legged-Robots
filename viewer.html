@@ -202,6 +202,10 @@ function buildEntities() {
     labels[rt] = makeLabel(RT_LABEL[rt] || rt); labels[rt].visible = false; scene.add(labels[rt]);
   }
   S = { verts: Float32Array.from(A.soma_verts.arr, (v) => v / 1000), tris: A.soma_tris.arr, w: Float32Array.from(A.soma_w.arr, (v) => v / 255), ji: A.soma_ji.arr };
+  for (let v = 0; v < SV; v++) {                           // re-normalise the uint8 weights per vertex: a sum off by 0.5% scales the body about the WORLD origin,
+    let s = 0; for (let k = 0; k < 4; k++) s += S.w[v * 4 + k];   // i.e. 3 cm at 6 m from it (streaky necks / hands on travelling clips)
+    if (s > 0) for (let k = 0; k < 4; k++) S.w[v * 4 + k] /= s;
+  }
   { const dom = new Int32Array(SV), n = {}, sum = {}; let lo = Infinity, hi = -Infinity;
     for (let v = 0; v < SV; v++) { let best = 0; for (let k = 1; k < 4; k++) if (S.w[v * 4 + k] > S.w[v * 4 + best]) best = k; const j = S.ji[v * 4 + best]; dom[v] = j;
       const y = S.verts[v * 3 + 1]; n[j] = (n[j] || 0) + 1; sum[j] = (sum[j] || 0) + y; lo = Math.min(lo, y); hi = Math.max(hi, y); }
