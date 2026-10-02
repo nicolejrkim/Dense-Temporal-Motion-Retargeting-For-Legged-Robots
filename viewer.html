@@ -173,7 +173,7 @@ function makeLabel(spec) {
 }
 
 /* ---------- build ---------- */
-let A, S, cur, t = 0, meshes = {}, labels = {}, humanMesh = null, humanGeo = null;
+let A, S, cur, t = 0, meshes = {}, labels = {}, humanMesh = null, humanGeo = null, PELVIS = [];
 const SV = META.somaVerts, SJ = META.somaJoints;
 function tintColors(cols, tint, amt) {          // vertex colour mix used by the classic viewer: mix(c, tint*luma, amt)
   const out = new Float32Array(cols.length);
@@ -200,6 +200,11 @@ function buildEntities() {
     labels[rt] = makeLabel(RT_LABEL[rt] || rt); labels[rt].visible = false; scene.add(labels[rt]);
   }
   S = { verts: Float32Array.from(A.soma_verts.arr, (v) => v / 1000), tris: A.soma_tris.arr, w: Float32Array.from(A.soma_w.arr, (v) => v / 255), ji: A.soma_ji.arr };
+  { const dom = new Int32Array(SV), n = {}, sum = {}; let lo = Infinity, hi = -Infinity;
+    for (let v = 0; v < SV; v++) { let best = 0; for (let k = 1; k < 4; k++) if (S.w[v * 4 + k] > S.w[v * 4 + best]) best = k; const j = S.ji[v * 4 + best]; dom[v] = j;
+      const y = S.verts[v * 3 + 1]; n[j] = (n[j] || 0) + 1; sum[j] = (sum[j] || 0) + y; lo = Math.min(lo, y); hi = Math.max(hi, y); }
+    let pj = -1, pd = Infinity; for (const j in n) { if (n[j] < 30) continue; const d = Math.abs((sum[j] / n[j] - lo) / (hi - lo) - 0.55); if (d < pd) { pd = d; pj = +j; } }
+    PELVIS = []; for (let v = 0; v < SV; v++) if (dom[v] === pj) PELVIS.push(v); }
   humanGeo = new THREE.BufferGeometry(); humanGeo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(SV * 3), 3)); humanGeo.setIndex(new THREE.BufferAttribute(S.tris, 1));
   humanGeo.computeVertexNormals();
   const hal = (META.alpha || {}).human; const hm = new THREE.MeshStandardMaterial({ color: cssColor("--human"), roughness: 0.7, metalness: 0.0, transparent: hal !== undefined && hal < 1, opacity: hal === undefined ? 1 : hal });
@@ -261,7 +266,7 @@ async function setMotion(idx) {
   for (const rt in rts) { const tr = rts[rt]; let z = 0; for (let b = 0; b < tr.nb; b++) z = Math.max(z, tr.t[b * 3 + 2] / 1000); cur.top[rt] = z + 0.45; }
   cur.top.human = 2.05; t = 0; plotwrap.hidden = !(META.plot && META.plot[m.name]);
   if (META.laneLabelsByMotion && META.laneLabelsByMotion[m.name]) buildLaneLabels(m.name);
-  frameCamera(m);
+  frameCamera(m); anchorReset = true;
   meta.textContent = m.frames + " f @ " + FPS + " fps · " + cur.DUR.toFixed(1) + " s"; refreshChips();
 }
 function curSpacing() { return cardsOn ? ((CARDS && CARDS.spacing) || 5) : (META.spacing || 1.45); }
@@ -405,13 +410,14 @@ if (CARDS) {
     d.appendChild(ti); cardsEl.appendChild(d); cellEls.push(d); }
   controls.enablePan = !cardsOn; controls.minDistance = 1.2; controls.maxDistance = 60;
 }
-const camOff = new THREE.Vector3(), anchor = new THREE.Vector3();
+const camOff = new THREE.Vector3(), anchor = new THREE.Vector3(), anchorS = {}; let anchorReset = true, anchorLastT = 0;
 function cellMembers(id) {                                   // a cell is an entity or a lane (META.groups value): all its entities share the cell
   if (id === "human") return ["human"]; const G = META.groups || {}, mem = [];
   for (const rt of META.retargeters) if ((G[rt] || rt) === id) mem.push(rt); return mem.length ? mem : [id];
 }
 function renderCards(rootXY, ents, offs) {
   const W = cv.width, H = cv.height, sr = renderer.getPixelRatio(), stR = stage.getBoundingClientRect();
+  if (t < anchorLastT - 1e-3) anchorReset = true; anchorLastT = t;       // loop restart / scrub back: snap, do not glide across the floor
   camOff.copy(camera.position).sub(controls.target);                      // the shared orbit (azimuth / elevation / distance)
   renderer.setScissorTest(false); renderer.setViewport(0, 0, W, H); renderer.autoClear = true; renderer.clear();
   renderer.setScissorTest(true); renderer.autoClear = false;
@@ -422,14 +428,16 @@ function renderCards(rootXY, ents, offs) {
     renderer.setViewport(x, y, w, hh); renderer.setScissor(x, y, w, hh);
     const AL = META.alpha || {}, mem = cellMembers(id).filter((e) => ents.includes(e) && rootXY[e]);
     const lead = mem.find((e) => !(AL[e] < 1)) || mem[0]; let base = lead ? rootXY[lead] : [0, 0];
-    if (lead === "human") {                                  // follow the body's centroid, not joint 0 (some exports park a dummy joint 0 at z = -1)
-      let sx = 0, sy = 0, n = 0; for (let u = 0; u < SJ; u++) { if (JT[u * 3 + 2] < -0.5) continue; sx += JT[u * 3]; sy += JT[u * 3 + 1]; n++; }
-      if (n) base = [offs.human[0] + sx / n, offs.human[1] + sy / n];
+    if (lead === "human" && PELVIS.length) {                 // follow the posed pelvis (joint 0 of the exports is a fixed origin point; the limb-swept centroid shakes)
+      const P = humanGeo.attributes.position.array; let sx = 0, sy = 0; for (const v of PELVIS) { sx += P[v * 3]; sy += P[v * 3 + 1]; }
+      base = [offs.human[0] + sx / PELVIS.length, offs.human[1] + sy / PELVIS.length];
     }
+    const prev = anchorS[id]; if (prev && !anchorReset) base = [prev[0] + (base[0] - prev[0]) * 0.22, prev[1] + (base[1] - prev[1]) * 0.22]; anchorS[id] = base;
     anchor.set(base[0], base[1], lookZ); floorMat.uniforms.uCenter.value.set(base[0], base[1]);
     camera.aspect = w / hh; camera.updateProjectionMatrix(); camera.position.copy(anchor).add(camOff); camera.lookAt(anchor);
     renderer.render(scene, camera);
   });
+  anchorReset = false;
   renderer.setScissorTest(false); renderer.autoClear = true; renderer.setViewport(0, 0, W, H);
   camera.position.copy(controls.target).add(camOff); camera.aspect = W / Math.max(1, H); camera.updateProjectionMatrix();
 }
