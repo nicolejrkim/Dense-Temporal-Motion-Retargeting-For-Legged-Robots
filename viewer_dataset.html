@@ -387,6 +387,8 @@ let plotDrag = false; pc.addEventListener("pointerdown", (e) => { plotDrag = tru
 /* ---------- render loop ---------- */
 const FC = META.frameColors || {}, lastHex = {};
 function render(ts) {
+  if (!inView || document.hidden || stage.clientWidth === 0) { lastTs = null; setTimeout(() => requestAnimationFrame(render), 200); return; }   // off screen (collapsed, scrolled away, other tab): hold the clock, free the GPU for the viewers in view
+  frameDt = lastTs === null ? 1 / 60 : Math.min(0.25, Math.max(1e-3, (ts - lastTs) / 1000));
   if (lastTs !== null && playing) { t += (ts - lastTs) / 1000 * speed; if (t >= cur.DUR) t -= cur.DUR; } lastTs = ts;
   const ents = activeEntities(), G = META.groups || {}, SP = curSpacing(), lanes = [];
   ents.forEach((id) => { const g = G[id] || id; if (!lanes.includes(g)) lanes.push(g); });
@@ -453,6 +455,9 @@ if (CARDS) {
   controls.enablePan = !cardsOn; controls.minDistance = 1.2; controls.maxDistance = 60;
 }
 const camOff = new THREE.Vector3(), anchor = new THREE.Vector3(), anchorS = {}; let anchorReset = true, anchorLastT = 0, humanHeight = 0;
+let inView = true, frameDt = 1 / 60;                          // rendered only while the stage is on screen; frameDt = wall-clock seconds since the last drawn frame
+new IntersectionObserver((es) => { inView = es.some((e) => e.isIntersecting); }, { threshold: 0 }).observe(stage);
+const ANCHOR_TAU = 0.07;                                      // follow-camera smoothing time constant (s): per-second, so a slow frame rate does not leave the camera behind
 function subjectHeight(id) {                                 // standing height estimate: robots from the clip's top link, the human from its skinned mesh
   if (id === "human") { if (!humanHeight && humanGeo) { const P = humanGeo.attributes.position.array; let lo = Infinity, hi = -Infinity; for (let v = 2; v < P.length; v += 3) { lo = Math.min(lo, P[v]); hi = Math.max(hi, P[v]); } humanHeight = hi - lo; } return humanHeight || 1.75; }
   return Math.max(0.5, (cur.top[id] || 1.8) - 0.45);
@@ -503,7 +508,8 @@ function renderCards(rootXY, ents, offs) {
       const P = humanGeo.attributes.position.array; let sx = 0, sy = 0; for (const v of PELVIS) { sx += P[v * 3]; sy += P[v * 3 + 1]; }
       base = [offs.human[0] + sx / PELVIS.length, offs.human[1] + sy / PELVIS.length];
     }
-    const prev = anchorS[id]; if (prev && !anchorReset) base = [prev[0] + (base[0] - prev[0]) * 0.22, prev[1] + (base[1] - prev[1]) * 0.22]; anchorS[id] = base;
+    const prev = anchorS[id], ka = 1 - Math.exp(-frameDt / ANCHOR_TAU);   // 0.22 per frame at 60 fps; a body more than 1 m from the smoothed anchor snaps
+    if (prev && !anchorReset && Math.hypot(base[0] - prev[0], base[1] - prev[1]) < 1.0) base = [prev[0] + (base[0] - prev[0]) * ka, prev[1] + (base[1] - prev[1]) * ka]; anchorS[id] = base;
     anchor.set(base[0], base[1], lookZ); floorMat.uniforms.uCenter.value.set(base[0], base[1]);
     camera.aspect = w / hh; camera.updateProjectionMatrix();
     const ds = cardDistScale(lead, w / hh); camera.position.copy(anchor).addScaledVector(camOff, ds); camera.lookAt(anchor);
