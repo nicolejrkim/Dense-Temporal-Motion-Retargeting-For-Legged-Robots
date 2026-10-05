@@ -34,7 +34,7 @@
   .stage.cardsmode .legend { top:auto; bottom:8px; right:12px; flex-direction:row; flex-wrap:wrap; justify-content:flex-end; max-width:72%; gap:5px; }
   .stage.cardsmode .hint { bottom:12px; max-width:26%; line-height:1.35; }
   .stage.cardsmode .legend { display:none; }                /* cards: every subject is always shown, no toggles */
-  @media (max-width:900px) { .cards.wide { grid-template-columns:repeat(3, 1fr) !important; grid-template-rows:none !important; grid-auto-rows:1fr; } }
+  @media (max-width:900px) { .cards.wide { grid-template-columns:repeat(3, 1fr) !important; grid-template-rows:none !important; grid-auto-rows:1fr; } .stage.cardsmode .hint { display:none; } }   /* reflowed grid: no room for the hint */
   @media (max-width:640px) { .cards { grid-template-columns:repeat(2, 1fr) !important; grid-template-rows:none !important; grid-auto-rows:1fr; } }
   .hint { position:absolute; left:12px; bottom:10px; font-family:var(--font-mono); font-size:10.5px; color:var(--muted); pointer-events:none; }
   .loading { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:12px; color:var(--muted); pointer-events:none; }
@@ -405,7 +405,7 @@ function render(ts) {
   const fadeDone = (mat, base, done) => { const o = done ? Math.min(base, 0.3) : base; if (mat.opacity !== o) { mat.opacity = o; mat.transparent = o < 1; mat.depthWrite = o >= 1; mat.needsUpdate = true; } };
   fadeDone(humanMesh.material, (META.alpha || {}).human == null ? 1 : META.alpha.human, cur.humanF < cur.F - 1 && t * FPS >= cur.humanF - 1);
   humanMesh.visible = ents.includes("human"); humanDepth.visible = humanMesh.visible && humanMesh.material.transparent; humanDepth.layers.mask = humanMesh.layers.mask; labels.human.visible = humanMesh.visible && sideBySide && !useLane && !cardsOn;
-  if (humanMesh.visible) { skinSoma(t); humanMesh.position.set(...offs.human); humanDepth.position.copy(humanMesh.position); rootXY.human = [offs.human[0] + JT[0], offs.human[1] + JT[1]]; labels.human.position.set(rootXY.human[0], rootXY.human[1], labelZ("human")); }
+  if (humanMesh.visible) { skinSoma(t); humanMesh.position.set(...offs.human); humanDepth.position.copy(humanMesh.position); rootXY.human = [offs.human[0] + JT[0], offs.human[1] + JT[1], 0]; labels.human.position.set(rootXY.human[0], rootXY.human[1], labelZ("human")); }
   for (const rt of META.retargeters) {
     const E = meshes[rt], on = ents.includes(rt); E.group.visible = on; labels[rt].visible = on && sideBySide; if (!on) continue;
     const tr = cur.rts[rt]; E.group.position.set(...offs[rt]);
@@ -414,7 +414,7 @@ function render(ts) {
     if (fcs && fcs.length) { const fe = Math.min(Math.max(Math.floor(fi) - tr.f0, 0), fcs.length - 1); if (lastHex[rt] !== fcs[fe]) { lastHex[rt] = fcs[fe]; const col = hex2(fcs[fe]);
       for (const b of E.bodies) { b.geometry.attributes.color.array.set(tintColors(b.userData.cols, col, b.userData.amt)); b.geometry.attributes.color.needsUpdate = true; } } }
     for (let bi = 0; bi < E.bodies.length; bi++) { const b = E.bodies[bi]; b.matrix.copy(bodyMatrix(tr, fi, bi)); b.matrixWorldNeedsUpdate = true; }
-    const r0 = E.bodies[0].matrix.elements; rootXY[rt] = [offs[rt][0] + r0[12], offs[rt][1] + r0[13]];
+    const r0 = E.bodies[0].matrix.elements; rootXY[rt] = [offs[rt][0] + r0[12], offs[rt][1] + r0[13], r0[14]];
     labels[rt].visible = on && sideBySide && !useLane && !cardsOn; labels[rt].position.set(rootXY[rt][0], rootXY[rt][1], labelZ(rt));
   }
   if (useLane && sideBySide && !cardsOn) {                               // one label per lane, following the lane's opaque body (else its first body)
@@ -491,28 +491,31 @@ function cellMembers(id) {                                   // a cell is an ent
   for (const rt of META.retargeters) if ((G[rt] || rt) === id) mem.push(rt); return mem.length ? mem : [id];
 }
 function renderCards(rootXY, ents, offs) {
-  const W = cv.width, H = cv.height, sr = renderer.getPixelRatio(), stR = stage.getBoundingClientRect();
+  const W = stage.clientWidth, H = stage.clientHeight, stR = stage.getBoundingClientRect();   // CSS px: three.js scales viewport/scissor by the pixel ratio itself (buffer px here = 2x zoom on Retina)
   if (t < anchorLastT - 1e-3) anchorReset = true; anchorLastT = t;       // loop restart / scrub back: snap, do not glide across the floor
   camOff.copy(camera.position).sub(controls.target);                      // the shared orbit (azimuth / elevation / distance)
   renderer.setScissorTest(false); renderer.setViewport(0, 0, W, H); renderer.autoClear = true; renderer.clear();
   renderer.setScissorTest(true); renderer.autoClear = false;
   const lookZ = CARDS.lookZ == null ? 1.0 : CARDS.lookZ;
   CARDS.cells.forEach((id, i) => {
-    const r = cellEls[i].getBoundingClientRect(), x = Math.round((r.left - stR.left) * sr), y = Math.round((stR.bottom - r.bottom) * sr), w = Math.round(r.width * sr), hh = Math.round(r.height * sr);
+    const r = cellEls[i].getBoundingClientRect(), x = Math.round(r.left - stR.left), y = Math.round(stR.bottom - r.bottom), w = Math.round(r.width), hh = Math.round(r.height);
     if (w < 2 || hh < 2) return;
     renderer.setViewport(x, y, w, hh); renderer.setScissor(x, y, w, hh);
     const AL = META.alpha || {}, mem = cellMembers(id).filter((e) => ents.includes(e) && rootXY[e]);
-    const lead = mem.find((e) => !(AL[e] < 1)) || mem[0]; let base = lead ? rootXY[lead] : [0, 0];
+    const lead = mem.find((e) => !(AL[e] < 1)) || mem[0]; let base = lead ? rootXY[lead] : [0, 0, lookZ];
     const dn = cellEls[i].querySelector(".done"); if (dn) dn.classList.toggle("on", !!lead && ended(lead));
     if (lead === "human" && PELVIS.length) {                 // follow the posed pelvis (joint 0 of the exports is a fixed origin point; the limb-swept centroid shakes)
-      const P = humanGeo.attributes.position.array; let sx = 0, sy = 0; for (const v of PELVIS) { sx += P[v * 3]; sy += P[v * 3 + 1]; }
-      base = [offs.human[0] + sx / PELVIS.length, offs.human[1] + sy / PELVIS.length];
+      const P = humanGeo.attributes.position.array; let sx = 0, sy = 0, sz = 0; for (const v of PELVIS) { sx += P[v * 3]; sy += P[v * 3 + 1]; sz += P[v * 3 + 2]; }
+      base = [offs.human[0] + sx / PELVIS.length, offs.human[1] + sy / PELVIS.length, sz / PELVIS.length];
     }
+    const zb = base[2] == null ? lookZ : base[2];               // root height: look lower and pull back when the body is on the floor (crawl, sit, lie)
+    base = [base[0], base[1], Math.min(lookZ, Math.max(0.3, zb + 0.15)), Math.min(2, 1 + 2.5 * Math.max(0, 0.8 - zb))];
     const prev = anchorS[id], ka = 1 - Math.exp(-frameDt / ANCHOR_TAU);   // 0.22 per frame at 60 fps; a body more than 1 m from the smoothed anchor snaps
-    if (prev && !anchorReset && Math.hypot(base[0] - prev[0], base[1] - prev[1]) < 1.0) base = [prev[0] + (base[0] - prev[0]) * ka, prev[1] + (base[1] - prev[1]) * ka]; anchorS[id] = base;
-    anchor.set(base[0], base[1], lookZ); floorMat.uniforms.uCenter.value.set(base[0], base[1]);
+    if (prev && !anchorReset && Math.hypot(base[0] - prev[0], base[1] - prev[1]) < 1.0) base = base.map((v, k) => prev[k] + (v - prev[k]) * ka); anchorS[id] = base;
+    anchor.set(base[0], base[1], base[2]); floorMat.uniforms.uCenter.value.set(base[0], base[1]);
     camera.aspect = w / hh; camera.updateProjectionMatrix();
-    const ds = cardDistScale(lead, w / hh); camera.position.copy(anchor).addScaledVector(camOff, ds); camera.lookAt(anchor);
+    const ds = cardDistScale(lead, w / hh) * base[3];                 // a body on the floor lies long: pull back up to 2x
+    camera.position.copy(anchor).addScaledVector(camOff, ds); camera.lookAt(anchor);
     camera.layers.set(0); camera.layers.enable(1 + i);
     renderer.render(scene, camera);
   });
