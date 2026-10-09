@@ -51,6 +51,38 @@
   .layoutseg:not([hidden]) { display:inline-flex !important; }
   label.ctl { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); flex:none; }
 </style>
+<style>  /* ?theme=dark: the project page embeds the viewers on its dark background */
+  html.dark { color-scheme:dark; --ink:#ECEDF0; --muted:#9298A4; --line:#2A2D35; --bg:#101115; --panel:#16171C; }
+  html.dark .motionfilter, html.dark select, html.dark .btn, html.dark .seg button { background:#1E2026; }
+  html.dark .chip { background:#1E2026dd; } html.dark .cards .cell .tag { background:#16171Ccc; }
+  html.dark .cards .cell .tag.phys { color:#7FE3C4; border-color:#1F5A4A; background:#0E2A22; }
+  html.dark .cards .cell .done { background:#ECEDF0; color:#111; }
+  html.dark .seg button[aria-pressed="true"] { background:var(--ink); color:#111; }
+</style>
+<style>  /* a card can show real footage in place of its 3D subject (the project page asks for it by postMessage) */
+  .cards .cell .realcell { position:absolute; inset:0; border-radius:inherit; overflow:hidden; background:#0b0b0e; opacity:0; filter:blur(10px); transform:scale(1.02);
+    transition:opacity .7s cubic-bezier(.2,.8,.2,1), filter .7s cubic-bezier(.2,.8,.2,1), transform .9s cubic-bezier(.2,.8,.2,1); }
+  .cards .cell.real .realcell { opacity:1; filter:none; transform:none; }
+  .cards .cell .realcell video { width:100%; height:100%; object-fit:cover; display:block; }
+  :root .cards .cell .tag.real { color:#1d1d1f; background:#ffffffe0; border-color:transparent; }
+  .cards .cell.real .ct { color:#fff; text-shadow:0 1px 3px #000, 0 2px 14px #000; }
+  @media (prefers-reduced-motion: reduce) { .cards .cell .realcell { transition:opacity .2s; filter:none; transform:none; } }
+</style>
+<script>if (/[?&]theme=dark\b/.test(location.search)) document.documentElement.classList.add("dark");
+if (/[?&]compact=1\b/.test(location.search)) document.documentElement.classList.add("compact");</script>
+<style>  html.compact .bar, html.compact .hint, html.compact label.ctl, html.compact .layoutseg { display:none !important; }
+  /* timed flags on a card (META.cards.flags: {cell, text, from, to, kind}) */
+  .cards .cell .flag { position:absolute; left:50%; top:36px; transform:translate(-50%, -4px); padding:3px 11px; border-radius:999px; white-space:nowrap;
+    font-size:clamp(11px, 1.2vw, 13px); font-weight:600; opacity:0; transition:opacity .3s, transform .3s; background:#ffe2ddee; color:#7a1d12; z-index:2; }
+  .cards .cell .flag.warn { background:#fff1d0ee; color:#6b4a00; }
+  .cards .cell .flag.good { background:#e2f8e8ee; color:#0d5a2e; }
+  /* steps (META.cards.steps): the clip plays once per step, then the next step; chips in the control bar jump to a step */
+  .stepchips { display:inline-flex; gap:4px; flex:none; } .stepchips[hidden] { display:none; }
+  .stepchips button { font:inherit; font-size:12px; padding:5px 10px 5px 6px; border:1px solid var(--line); border-radius:999px; background:var(--panel); color:var(--muted); cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+  .stepchips button i { font-style:normal; display:inline-grid; place-items:center; width:17px; height:17px; border-radius:50%; background:var(--line); color:var(--ink); font-size:10.5px; font-weight:600; }
+  .stepchips button[aria-pressed="true"] { background:var(--ink); color:var(--bg); border-color:var(--ink); } .stepchips button[aria-pressed="true"] i { background:var(--bg); color:var(--ink); }
+  .cards .cell .flag.on { opacity:1; transform:translate(-50%, 0); }
+</style>
 <style>.titleblock h1 { display:none; } .seg { display:none; }</style>
 <script type="importmap">{ "imports": { "three": "./static/three/three.module.js", "three/addons/": "./static/three/addons/" } }</script>
 <style>:root, :root:not([data-theme="light"]), :root[data-theme="light"], :root[data-theme="dark"] { --rt-ref: #E69F00; --rt-w10: #009E73; --rt-w5: #009E73; --rt-w2: #009E73; --rt-w1: #009E73; --human: #E69F00; }</style>
@@ -75,6 +107,7 @@
   </div>
   <div class="plotwrap" id="plotwrap" hidden><canvas id="plot" aria-label="Root height against time; drag to scrub"></canvas></div>
   <footer class="controls">
+    <div class="stepchips" id="stepChips" hidden></div>
     <button class="btn" id="play" aria-label="Play or pause">
       <svg id="icoPlay" width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M3 1.5 12 7 3 12.5z"/></svg>
       <svg id="icoPause" width="14" height="14" viewBox="0 0 14 14" fill="currentColor" style="display:none"><path d="M2.5 1.5h3v11h-3zM8.5 1.5h3v11h-3z"/></svg>
@@ -152,11 +185,12 @@ const controls = new OrbitControls(camera, cv); controls.enableDamping = true; c
 controls.maxPolarAngle = Math.PI / 2 - 0.03; controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
 const key = new THREE.DirectionalLight(0xffffff, 2.6); key.position.set(3, -4, 8); key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
 key.shadow.camera.near = 0.5; key.shadow.camera.far = 40; key.shadow.bias = -0.0005; key.shadow.normalBias = 0.02; key.shadow.radius = 4; scene.add(key); scene.add(key.target);
-scene.add(new THREE.HemisphereLight(0xffffff, 0xd9dbe0, 0.35));
+const DARK = document.documentElement.classList.contains("dark");
+scene.add(new THREE.HemisphereLight(0xffffff, DARK ? 0x3a3d46 : 0xd9dbe0, 0.35));
 /* floor: soft grid that fades with distance + a shadow catcher */
 const floorMat = new THREE.ShaderMaterial({
   transparent: true, depthWrite: false,
-  uniforms: { uBg: { value: cssColor("--bg") }, uLine: { value: new THREE.Color(0xd8dbe1) }, uCenter: { value: new THREE.Vector2(0, 0) } },
+  uniforms: { uBg: { value: DARK ? new THREE.Color(0x15171c).convertLinearToSRGB() : cssColor("--bg") }, uLine: { value: DARK ? new THREE.Color(0x343945).convertLinearToSRGB() : new THREE.Color(0xd8dbe1) }, uCenter: { value: new THREE.Vector2(0, 0) } },
   vertexShader: "varying vec3 vP; void main(){ vP = (modelMatrix * vec4(position,1.0)).xyz; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }",
   fragmentShader: `varying vec3 vP; uniform vec3 uBg; uniform vec3 uLine; uniform vec2 uCenter;
     float gridLine(vec2 p, float s, float w){ vec2 g = abs(fract(p / s + 0.5) - 0.5) * s; vec2 fw = fwidth(p) * 1.0; vec2 l = 1.0 - smoothstep(w - fw, w + fw, g); return max(l.x, l.y); }
@@ -164,7 +198,7 @@ const floorMat = new THREE.ShaderMaterial({
       float d = length(vP.xy - uCenter); a *= smoothstep(22.0, 4.0, d); gl_FragColor = vec4(mix(uBg, uLine, a), 1.0); }`
 });
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), floorMat); floor.position.z = 0.0; floor.renderOrder = -2; scene.add(floor);
-const catcher = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.ShadowMaterial({ opacity: 0.26, color: 0x2a2f3a })); catcher.position.z = 0.001; catcher.receiveShadow = true; catcher.renderOrder = -1; scene.add(catcher);
+const catcher = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.ShadowMaterial({ opacity: DARK ? 0.55 : 0.26, color: DARK ? 0x000000 : 0x2a2f3a })); catcher.position.z = 0.001; catcher.receiveShadow = true; catcher.renderOrder = -1; scene.add(catcher);
 
 new ResizeObserver(() => { const W = stage.clientWidth, H = stage.clientHeight; renderer.setSize(W, H, false); camera.aspect = W / Math.max(1, H); camera.updateProjectionMatrix(); }).observe(stage);
 
@@ -183,7 +217,7 @@ function makeLabel(spec) {
 }
 
 /* ---------- build ---------- */
-let A, S, cur, t = 0, meshes = {}, labels = {}, humanMesh = null, humanDepth = null, humanGeo = null, PELVIS = [];
+let A, S, cur, t = 0, meshes = {}, labels = {}, humanMesh = null, humanDepth = null, humanGeo = null, PELVIS = [], PJ = 0, PELC = [0, 0, 0];
 const SV = META.somaVerts, SJ = META.somaJoints;
 function tintColors(cols, tint, amt) {          // vertex colour mix used by the classic viewer: mix(c, tint*luma, amt)
   const out = new Float32Array(cols.length);
@@ -218,7 +252,8 @@ function buildEntities() {
     for (let v = 0; v < SV; v++) { let best = 0; for (let k = 1; k < 4; k++) if (S.w[v * 4 + k] > S.w[v * 4 + best]) best = k; const j = S.ji[v * 4 + best]; dom[v] = j;
       const y = S.verts[v * 3 + 1]; n[j] = (n[j] || 0) + 1; sum[j] = (sum[j] || 0) + y; lo = Math.min(lo, y); hi = Math.max(hi, y); }
     let pj = -1, pd = Infinity; for (const j in n) { if (n[j] < 30) continue; const d = Math.abs((sum[j] / n[j] - lo) / (hi - lo) - 0.55); if (d < pd) { pd = d; pj = +j; } }
-    PELVIS = []; for (let v = 0; v < SV; v++) if (dom[v] === pj) PELVIS.push(v); }
+    PELVIS = []; for (let v = 0; v < SV; v++) if (dom[v] === pj) PELVIS.push(v);
+    PJ = Math.max(0, pj); PELC = [0, 0, 0]; for (const v of PELVIS) for (let k = 0; k < 3; k++) PELC[k] += S.verts[v * 3 + k] / PELVIS.length; }
   humanGeo = new THREE.BufferGeometry(); humanGeo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(SV * 3), 3)); humanGeo.setIndex(new THREE.BufferAttribute(S.tris, 1));
   humanGeo.computeVertexNormals();
   const hal = (META.alpha || {}).human; const hm = new THREE.MeshStandardMaterial({ color: cssColor("--human"), roughness: 0.7, metalness: 0.0, transparent: hal !== undefined && hal < 1, opacity: hal === undefined ? 1 : hal });
@@ -283,14 +318,22 @@ async function setMotion(idx) {
   for (const rt in rts) { const tr = rts[rt]; let z = 0; for (let b = 0; b < tr.nb; b++) z = Math.max(z, tr.t[b * 3 + 2] / 1000); cur.top[rt] = z + 0.45; }
   cur.top.human = 2.05; t = 0; plotwrap.hidden = !(META.plot && META.plot[m.name]);
   if (META.laneLabelsByMotion && META.laneLabelsByMotion[m.name]) buildLaneLabels(m.name);
-  frameCamera(m); anchorReset = true; humanHeight = 0;
+  frameCamera(m); humanHeight = 0;
   meta.textContent = m.frames + " f @ " + FPS + " fps · " + cur.DUR.toFixed(1) + " s"; refreshChips();
 }
 function curSpacing() { return cardsOn ? ((CARDS && CARDS.spacing) || 5) : (META.spacing || 1.45); }
+function travelAzimuth() {                                  // CARDS.travelAz (deg): the camera of the page's renders (MuJoCo azimuth = travel direction + travelAz, from the
+  const tr = cur.rts[CARDS.travelFrom || "dtmr"]; let a = Math.PI / 2;   //   first to the last root position of the DTMR track; 90 deg for a motion that stays in place)
+  if (tr) { const e0 = bodyMatrix(tr, tr.f0, 0).elements, x0 = e0[12], y0 = e0[13], e1 = bodyMatrix(tr, tr.f0 + tr.F - 1, 0).elements, dx = e1[12] - x0, dy = e1[13] - y0;
+    if (Math.hypot(dx, dy) > 0.6) a = Math.atan2(dy, dx) + CARDS.travelAz * Math.PI / 180; }
+  return a + Math.PI;                                         // MuJoCo's azimuth is the viewing direction; the camera sits opposite
+}
 function frameCamera(mm) {                                   // initial view for the current clip and layout (cards: closer, frontal, fixed distance)
   const m = mm || META.motions[+sel.value || 0], fx = m.fx == null ? 1 : m.fx, fy = m.fy == null ? 0 : m.fy;
-  const az = Math.atan2(fy, fx) + (cardsOn ? 0.0 : 0.35), el = cardsOn ? 0.12 : 0.22, dist = cardsOn ? ((CARDS && CARDS.dist) || 3.7) : (META.camDist || 6.2);
+  const az = cardsOn && CARDS.travelAz != null ? travelAzimuth() : Math.atan2(fy, fx) + (cardsOn ? (CARDS.az || 0) : 0.35), el = cardsOn ? (CARDS.el != null ? CARDS.el : 0.12) : 0.22,   // CARDS.az / CARDS.el: a diagonal card view (rad)
+        dist = cardsOn ? ((CARDS && CARDS.dist) || 3.7) : (META.camDist || 6.2);
   const tgt = new THREE.Vector3(m.cx, m.cy, cardsOn ? ((CARDS && CARDS.lookZ != null) ? CARDS.lookZ : 1.0) : 0.85);
+  camera.fov = cardsOn && CARDS.fov ? CARDS.fov : 32; camera.updateProjectionMatrix();
   controls.target.copy(tgt); camera.position.set(tgt.x + dist * Math.cos(el) * Math.cos(az), tgt.y + dist * Math.cos(el) * Math.sin(az), tgt.z + dist * Math.sin(el)); controls.update();
   floorMat.uniforms.uCenter.value.set(m.cx, m.cy); key.target.position.set(m.cx, m.cy, 0); key.position.set(m.cx + 3, m.cy - 4, 8);
   const ext = 4 + 0.5 * curSpacing() * Math.max(1, Object.keys(cur.rts).length + 1); const sc = key.shadow.camera; if (CARDS) key.shadow.mapSize.set(4096, 4096); sc.left = -ext; sc.right = ext; sc.top = ext; sc.bottom = -ext; sc.updateProjectionMatrix();
@@ -313,7 +356,7 @@ function refreshChips() {
   mk("human", "SOMA body", "reference", cssVar("--human"), !!cur.human.q);
   for (const rt of META.retargeters) { const r = cur.rts[rt]; mk(rt, RT_LABEL[rt], r ? META.robots[rt].dof + " dof" : "n/a", cssVar("--rt-" + rt), !!r); }
 }
-function activeEntities() { const out = []; if (show.human && cur.human.q) out.push("human"); for (const rt of META.retargeters) if (show[rt] && cur.rts[rt]) out.push(rt); return out; }
+function activeEntities() { const out = []; if (show.human && cur.human.q) out.push("human"); for (const rt of META.retargeters) if (show[rt] && cur.rts[rt] && !stepHidden.has(rt)) out.push(rt); return out; }
 function fillSelect(filter) {                               // optgroups from META.motionGroups; the filter box (long lists) matches label / name / group
   const q = (filter || "").trim().toLowerCase(), G = META.motionGroups || {}, order = META.groupOrder || [], groups = {}, keep = +sel.value || 0;
   sel.innerHTML = ""; let n = 0, first = -1;
@@ -389,7 +432,7 @@ const FC = META.frameColors || {}, lastHex = {};
 function render(ts) {
   if (!inView || document.hidden || stage.clientWidth === 0) { lastTs = null; setTimeout(() => requestAnimationFrame(render), 200); return; }   // off screen (collapsed, scrolled away, other tab): hold the clock, free the GPU for the viewers in view
   frameDt = lastTs === null ? 1 / 60 : Math.min(0.25, Math.max(1e-3, (ts - lastTs) / 1000));
-  if (lastTs !== null && playing) { t += (ts - lastTs) / 1000 * speed; if (t >= cur.DUR) t -= cur.DUR; } lastTs = ts;
+  if (lastTs !== null && playing) { t += (ts - lastTs) / 1000 * speed; if (t >= cur.DUR) { t -= cur.DUR; nextStep(); } } lastTs = ts; syncReal(); updateFlags();
   const ents = activeEntities(), G = META.groups || {}, SP = curSpacing(), lanes = [];
   ents.forEach((id) => { const g = G[id] || id; if (!lanes.includes(g)) lanes.push(g); });
   const mid = (lanes.length - 1) / 2, offs = {};
@@ -433,6 +476,8 @@ function render(ts) {
 }
 /* ---------- card grid: one viewport per subject, all cameras at the same distance (true scale), shared orbit ---------- */
 const CARDS = META.cards || null, cardsEl = $("cards"), cellEls = [];
+{ const keep = new URLSearchParams(location.search).get("cells");   // ?cells=a,b: only these cards
+  if (CARDS && keep) { const k = keep.split(","); CARDS.cells = CARDS.cells.filter((c) => k.includes(c)); CARDS.cols = Math.max(1, CARDS.cells.length); } }
 let cardsOn = !!(CARDS && CARDS.default !== "row");
 function setLayout(cards) {
   cardsOn = !!CARDS && cards; cardsEl.hidden = !cardsOn; stage.classList.toggle("cardsmode", cardsOn);
@@ -452,12 +497,32 @@ if (CARDS) {
     const tg = CARDS.tags && CARDS.tags[id]; if (tg) { const e = document.createElement("div"); e.className = "tag" + (/physics sim|simulated|DTMR/.test(tg) && !/no physics/.test(tg) ? " phys" : ""); e.textContent = tg; d.appendChild(e); }
     const dn = document.createElement("div"); dn.className = "done"; dn.textContent = "done"; d.appendChild(dn);
     d.appendChild(ti); cardsEl.appendChild(d); cellEls.push(d); }
+  for (const fl of CARDS.flags || []) { const i = CARDS.cells.indexOf(fl.cell); if (i < 0) continue;
+    const e = document.createElement("div"); e.className = "flag " + (fl.kind || "bad"); e.textContent = fl.text; cellEls[i].appendChild(e); fl.el = e; }
   controls.enablePan = !cardsOn; controls.minDistance = 1.2; controls.maxDistance = 60;
 }
-const camOff = new THREE.Vector3(), anchor = new THREE.Vector3(), anchorS = {}; let anchorReset = true, anchorLastT = 0, humanHeight = 0;
+const camOff = new THREE.Vector3(), anchor = new THREE.Vector3(); let humanHeight = 0;
 let inView = true, frameDt = 1 / 60;                          // rendered only while the stage is on screen; frameDt = wall-clock seconds since the last drawn frame
 new IntersectionObserver((es) => { inView = es.some((e) => e.isIntersecting); }, { threshold: 0 }).observe(stage);
-const ANCHOR_TAU = 0.07;                                      // follow-camera smoothing time constant (s): per-second, so a slow frame rate does not leave the camera behind
+const CAM_SIGMA = (CARDS && CARDS.camSmooth != null) ? CARDS.camSmooth : 0.4;   // steady follow: the card camera tracks the subject's root path smoothed by a centred Gaussian (s)
+function rootPath(id) {                                     // per viewer frame: root (the human: pelvis) position, lane offset excluded, then smoothed; computed once per clip
+  const F = cur.F, P = new Float32Array(F * 3), tr = cur.rts[id];
+  if (id === "human") { const q = cur.human.q, tt = cur.human.t, HF = cur.humanF || F;
+    for (let f = 0; f < F; f++) { const o = Math.min(f, HF - 1) * SJ + PJ, qq = nlerpQ(q, o * 4, q, o * 4, 0); quatToMat3(qq[0], qq[1], qq[2], qq[3], m3);
+      for (let k = 0; k < 3; k++) P[f * 3 + k] = m3[k] * PELC[0] + m3[k + 3] * PELC[1] + m3[k + 6] * PELC[2] + tt[o * 3 + k] / 1000; } }
+  else if (tr) for (let f = 0; f < F; f++) { const e = bodyMatrix(tr, f, 0).elements; P[f * 3] = e[12]; P[f * 3 + 1] = e[13]; P[f * 3 + 2] = e[14]; }
+  const sg = Math.max(1e-3, CAM_SIGMA * FPS), rad = Math.ceil(3 * sg), wt = []; for (let d = -rad; d <= rad; d++) wt.push(Math.exp(-0.5 * (d / sg) ** 2));
+  const out = new Float32Array(F * 3);                       // centred, so no lag: hip sway and bounce are filtered out, travel is followed; the ends hold
+  for (let f = 0; f < F; f++) { let sx = 0, sy = 0, sz = 0, sw = 0;
+    for (let d = -rad; d <= rad; d++) { const g = Math.min(F - 1, Math.max(0, f + d)) * 3, w = wt[d + rad]; sx += w * P[g]; sy += w * P[g + 1]; sz += w * P[g + 2]; sw += w; }
+    out[f * 3] = sx / sw; out[f * 3 + 1] = sy / sw; out[f * 3 + 2] = sz / sw; }
+  return out;
+}
+function steadyRoot(id, fi) {
+  const paths = cur.paths || (cur.paths = {}), P = paths[id] || (paths[id] = rootPath(id)), F = cur.F;
+  const i0 = Math.min(Math.max(Math.floor(fi), 0), F - 1), i1 = Math.min(i0 + 1, F - 1), a = Math.min(1, Math.max(0, fi - i0));
+  return [0, 1, 2].map((k) => P[i0 * 3 + k] * (1 - a) + P[i1 * 3 + k] * a);
+}
 function subjectHeight(id) {                                 // standing height estimate: robots from the clip's top link, the human from its skinned mesh
   if (id === "human") { if (!humanHeight && humanGeo) { const P = humanGeo.attributes.position.array; let lo = Infinity, hi = -Infinity; for (let v = 2; v < P.length; v += 3) { lo = Math.min(lo, P[v]); hi = Math.max(hi, P[v]); } humanHeight = hi - lo; } return humanHeight || 1.75; }
   return Math.max(0.5, (cur.top[id] || 1.8) - 0.45);
@@ -492,7 +557,6 @@ function cellMembers(id) {                                   // a cell is an ent
 }
 function renderCards(rootXY, ents, offs) {
   const W = stage.clientWidth, H = stage.clientHeight, stR = stage.getBoundingClientRect();   // CSS px: three.js scales viewport/scissor by the pixel ratio itself (buffer px here = 2x zoom on Retina)
-  if (t < anchorLastT - 1e-3) anchorReset = true; anchorLastT = t;       // loop restart / scrub back: snap, do not glide across the floor
   camOff.copy(camera.position).sub(controls.target);                      // the shared orbit (azimuth / elevation / distance)
   renderer.setScissorTest(false); renderer.setViewport(0, 0, W, H); renderer.autoClear = true; renderer.clear();
   renderer.setScissorTest(true); renderer.autoClear = false;
@@ -504,14 +568,9 @@ function renderCards(rootXY, ents, offs) {
     const AL = META.alpha || {}, mem = cellMembers(id).filter((e) => ents.includes(e) && rootXY[e]);
     const lead = mem.find((e) => !(AL[e] < 1)) || mem[0]; let base = lead ? rootXY[lead] : [0, 0, lookZ];
     const dn = cellEls[i].querySelector(".done"); if (dn) dn.classList.toggle("on", !!lead && ended(lead));
-    if (lead === "human" && PELVIS.length) {                 // follow the posed pelvis (joint 0 of the exports is a fixed origin point; the limb-swept centroid shakes)
-      const P = humanGeo.attributes.position.array; let sx = 0, sy = 0, sz = 0; for (const v of PELVIS) { sx += P[v * 3]; sy += P[v * 3 + 1]; sz += P[v * 3 + 2]; }
-      base = [offs.human[0] + sx / PELVIS.length, offs.human[1] + sy / PELVIS.length, sz / PELVIS.length];
-    }
+    if (lead) { const p = steadyRoot(lead, t * FPS), o = offs[lead] || [0, 0, 0]; base = [o[0] + p[0], o[1] + p[1], p[2]]; }   // the human: its pelvis (joint 0 of the exports is a fixed origin point)
     const zb = base[2] == null ? lookZ : base[2];               // root height: look lower and pull back when the body is on the floor (crawl, sit, lie)
     base = [base[0], base[1], Math.min(lookZ, Math.max(0.3, zb + 0.15)), Math.min(2, 1 + 2.5 * Math.max(0, 0.8 - zb))];
-    const prev = anchorS[id], ka = 1 - Math.exp(-frameDt / ANCHOR_TAU);   // 0.22 per frame at 60 fps; a body more than 1 m from the smoothed anchor snaps
-    if (prev && !anchorReset && Math.hypot(base[0] - prev[0], base[1] - prev[1]) < 1.0) base = base.map((v, k) => prev[k] + (v - prev[k]) * ka); anchorS[id] = base;
     anchor.set(base[0], base[1], base[2]); floorMat.uniforms.uCenter.value.set(base[0], base[1]);
     camera.aspect = w / hh; camera.updateProjectionMatrix();
     const ds = cardDistScale(lead, w / hh) * base[3];                 // a body on the floor lies long: pull back up to 2x
@@ -519,12 +578,53 @@ function renderCards(rootXY, ents, offs) {
     camera.layers.set(0); camera.layers.enable(1 + i);
     renderer.render(scene, camera);
   });
-  anchorReset = false; camera.layers.enableAll();
+  camera.layers.enableAll();
   renderer.setScissorTest(false); renderer.autoClear = true; renderer.setViewport(0, 0, W, H);
   camera.position.copy(controls.target).add(camOff); camera.aspect = W / Math.max(1, H); camera.updateProjectionMatrix();
 }
+/* real footage in a card: the embedding page sends {dtmr: "real", on, cell (index, negative = from the end), src, poster, tag, title, sync};
+   the video fades in over that card's 3D view, the card's tag and title switch with it. sync = {offset, rate}: the video follows the viewer's
+   clock (video time = offset + rate * t), i.e. it plays, pauses, loops and seeks with the scene; without sync it loops on its own */
+const realCells = {};
+addEventListener("message", (e) => {
+  const m = e.data; if (!m || m.dtmr !== "real" || !CARDS || e.origin !== location.origin) return;
+  const i = m.cell < 0 ? cellEls.length + m.cell : (m.cell || 0), cell = cellEls[i]; if (!cell) return;
+  let r = realCells[i];
+  if (!r) {
+    const w = document.createElement("div"), v = document.createElement("video"); w.className = "realcell";
+    v.muted = true; v.loop = true; v.playsInline = true; v.preload = "auto"; if (m.poster) v.poster = m.poster; v.src = m.src; w.appendChild(v); cell.insertBefore(w, cell.firstChild);
+    const tag = cell.querySelector(".tag"), ct = cell.querySelector(".ct");
+    r = realCells[i] = { v, tag, ct, tag0: tag && tag.textContent, cls0: tag && tag.className, ct0: ct && ct.textContent };
+  }
+  cell.classList.toggle("real", !!m.on); r.on = !!m.on; r.sync = m.sync || null;
+  if (m.on && r.sync) { r.v.loop = false; syncReal(); if (r.tag) { r.tag.textContent = m.tag || "real robot"; r.tag.className = "tag real"; } if (r.ct && m.title) r.ct.textContent = m.title; }
+  else if (m.on) { r.v.loop = true; r.v.currentTime = 0; r.v.play().catch(() => {}); if (r.tag) { r.tag.textContent = m.tag || "real robot"; r.tag.className = "tag real"; } if (r.ct && m.title) r.ct.textContent = m.title; }
+  else { r.v.pause(); if (r.tag) { r.tag.textContent = r.tag0; r.tag.className = r.cls0; } if (r.ct) r.ct.textContent = r.ct0; }
+});
+function updateFlags() { if (CARDS && CARDS.flags) for (const fl of CARDS.flags) if (fl.el) fl.el.classList.toggle("on", (fl.step == null || fl.step === stepIdx) && t >= (fl.from || 0) && t < (fl.to == null ? 1e9 : fl.to)); }
+/* steps: META.cards.steps = [{label, hide: [entities], alpha: {entity: opacity}, titles: {cell: text}}]; flags may carry "step" */
+const STEPS = (CARDS && CARDS.steps) || null, stepHidden = new Set(); let stepIdx = 0;
+function setStep(i) {
+  if (!STEPS) return; stepIdx = i; const S = STEPS[i], AL = META.alpha || {}; stepHidden.clear(); for (const e of S.hide || []) stepHidden.add(e);
+  for (const rt of META.retargeters) { const E = meshes[rt]; if (!E) continue; const a = (S.alpha && S.alpha[rt] != null) ? S.alpha[rt] : (AL[rt] == null ? 1 : AL[rt]); E.alpha = a;
+    for (const b of E.bodies) { const m = b.material; m.opacity = a; m.transparent = a < 1; m.depthWrite = a >= 1; m.needsUpdate = true; b.castShadow = a >= 1; } }
+  CARDS.cells.forEach((id, k) => { const ct = cellEls[k] && cellEls[k].querySelector(".ct"); if (!ct) return; if (ct.dataset.t0 == null) ct.dataset.t0 = ct.textContent;
+    ct.textContent = (S.titles && S.titles[id]) || ct.dataset.t0; });
+  stepChips.querySelectorAll("button").forEach((b, k) => b.setAttribute("aria-pressed", String(k === i)));
+}
+function nextStep() { if (STEPS) setStep((stepIdx + 1) % STEPS.length); }
+const stepChips = $("stepChips");
+if (STEPS) { stepChips.hidden = false;
+  STEPS.forEach((S, k) => { const b = document.createElement("button"); b.innerHTML = "<i>" + (k + 1) + "</i>"; b.appendChild(document.createTextNode(S.label || "Step " + (k + 1)));
+    b.addEventListener("click", () => { t = 0; setStep(k); setPlaying(true); }); stepChips.appendChild(b); }); }
+function syncReal() {                                        // every drawn frame: synced real footage tracks t (a seek only when it drifts)
+  for (const k in realCells) { const r = realCells[k], v = r.v; if (!r.on || !r.sync || !isFinite(v.duration)) continue;
+    const want = Math.min(Math.max(0, r.sync.offset + r.sync.rate * t), v.duration - 0.02);
+    if (playing) { v.playbackRate = speed * r.sync.rate; if (v.paused) v.play().catch(() => {}); } else if (!v.paused) v.pause();
+    if (!v.seeking && Math.abs(v.currentTime - want) > (playing ? 0.12 : 0.02)) v.currentTime = want; }
+}
 (async () => {
-  try { A = await decodeBlob(); buildEntities(); applyCardLayers(); await setMotion(0); $("loading").style.display = "none"; setPlaying(playing); requestAnimationFrame(render); }
+  try { A = await decodeBlob(); buildEntities(); applyCardLayers(); await setMotion(0); if (STEPS) setStep(0); $("loading").style.display = "none"; setPlaying(playing); requestAnimationFrame(render); }
   catch (e) { $("loading").textContent = "Failed to load the 3D view (" + e + ")."; console.error(e); }
 })();
 </script>
