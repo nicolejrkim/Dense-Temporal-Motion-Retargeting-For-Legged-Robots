@@ -185,8 +185,8 @@ const controls = new OrbitControls(camera, cv); controls.enableDamping = true; c
 controls.maxPolarAngle = Math.PI / 2 - 0.03; controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
 const key = new THREE.DirectionalLight(0xffffff, 2.6); key.position.set(3, -4, 8); key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
 key.shadow.camera.near = 0.5; key.shadow.camera.far = 40; key.shadow.bias = -0.0005; key.shadow.normalBias = 0.02; key.shadow.radius = 4; scene.add(key); scene.add(key.target);
-const DARK = document.documentElement.classList.contains("dark");
-scene.add(new THREE.HemisphereLight(0xffffff, DARK ? 0x3a3d46 : 0xd9dbe0, 0.35));
+let DARK = document.documentElement.classList.contains("dark");
+const hemi = new THREE.HemisphereLight(0xffffff, DARK ? 0x3a3d46 : 0xd9dbe0, 0.35); scene.add(hemi);
 /* floor: soft grid that fades with distance + a shadow catcher */
 const floorMat = new THREE.ShaderMaterial({
   transparent: true, depthWrite: false,
@@ -585,6 +585,13 @@ function renderCards(rootXY, ents, offs) {
 /* real footage in a card: the embedding page sends {dtmr: "real", on, cell (index, negative = from the end), src, poster, tag, title, sync};
    the video fades in over that card's 3D view, the card's tag and title switch with it. sync = {offset, rate}: the video follows the viewer's
    clock (video time = offset + rate * t), i.e. it plays, pauses, loops and seeks with the scene; without sync it loops on its own */
+/* day/night: the embedding page sends {dtmr: "theme", dark} when its theme switches */
+function applyTheme(dark) {
+  DARK = dark; document.documentElement.classList.toggle("dark", dark); scene.background = cssColor("--bg"); hemi.groundColor.set(dark ? 0x3a3d46 : 0xd9dbe0);
+  floorMat.uniforms.uBg.value = dark ? new THREE.Color(0x15171c).convertLinearToSRGB() : cssColor("--bg"); floorMat.uniforms.uLine.value = dark ? new THREE.Color(0x343945).convertLinearToSRGB() : new THREE.Color(0xd8dbe1);
+  catcher.material.opacity = dark ? 0.55 : 0.26; catcher.material.color.set(dark ? 0x000000 : 0x2a2f3a);
+}
+addEventListener("message", (e) => { const m = e.data; if (m && m.dtmr === "theme" && e.origin === location.origin) applyTheme(!!m.dark); });
 const realCells = {};
 addEventListener("message", (e) => {
   const m = e.data; if (!m || m.dtmr !== "real" || !CARDS || e.origin !== location.origin) return;

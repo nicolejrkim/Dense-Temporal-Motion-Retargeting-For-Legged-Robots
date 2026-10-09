@@ -353,10 +353,69 @@ details.explore .lead { margin: 0 0 12px; font-size: 15.5px; }
 .js .reveal.in { opacity: 1; transform: none; }
 @media (max-width: 760px) { body::before { animation: none; } }   /* phones: a still ambient light (no re-blur of the glass every frame) */
 @media (prefers-reduced-motion: reduce) { .js .reveal { opacity: 1; transform: none; transition: none; } .main-title, .otag, .cue, .cue svg, body::before { animation: none; } }
+
+/* ------------------------------------------------------------ day theme (html[data-theme="light"]); the night theme above is the default */
+.theme-btn { position: fixed; z-index: 30; top: 12px; right: 16px; width: 40px; height: 40px; padding: 0; border: 0; display: grid; place-items: center; color: var(--ink); transition: transform .2s ease; }
+.theme-btn:active { transform: scale(.93); }
+.theme-btn svg { width: 19px; height: 19px; grid-area: 1 / 1; transition: opacity .35s var(--ease), transform .5s var(--ease); }
+.theme-btn .i-sun { opacity: 0; transform: rotate(-90deg) scale(.6); }
+:root[data-theme="light"] .theme-btn .i-sun { opacity: 1; transform: none; }
+:root[data-theme="light"] .theme-btn .i-moon { opacity: 0; transform: rotate(90deg) scale(.6); }
+@media (min-width: 761px) { nav.toc { padding: 0 68px; } }   /* the capsule stays clear of the theme button */
+.theme-anim, .theme-anim *, .theme-anim *::before, .theme-anim *::after { transition: background-color .4s ease, color .4s ease, border-color .4s ease, box-shadow .4s ease !important; }
+.theme-anim .theme-btn svg { transition: opacity .35s var(--ease), transform .5s var(--ease) !important; }
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f3f4f7;
+  --ink: #16171b;
+  --ink2: rgba(22, 23, 27, .74);
+  --ink3: rgba(22, 23, 27, .58);
+  --line: rgba(0, 0, 0, .1);
+  --timing: #C98A0B;
+  --control: #1F7FC4;
+  --ours: #0E9F74;
+}
+:root[data-theme="light"] body::before { opacity: .8; }
+:root[data-theme="light"] body::after { background: linear-gradient(rgba(0, 0, 0, .045) 1px, transparent 1px) 0 0 / 64px 64px, linear-gradient(90deg, rgba(0, 0, 0, .045) 1px, transparent 1px) 0 0 / 64px 64px; }
+:root[data-theme="light"] :focus-visible { outline-color: rgba(0, 0, 0, .7); }
+:root[data-theme="light"] .glass { background: linear-gradient(180deg, rgba(255, 255, 255, .82), rgba(255, 255, 255, .56));
+  box-shadow: inset 0 1px 0 #fff, 0 8px 28px rgba(30, 40, 60, .1); }
+:root[data-theme="light"] .glass::before { background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(0, 0, 0, .05) 40%, rgba(0, 0, 0, .1) 75%, rgba(255, 255, 255, .8) 100%); }
+:root[data-theme="light"] .btn:hover { background: linear-gradient(180deg, #fff, rgba(255, 255, 255, .78)); box-shadow: inset 0 1px 0 #fff, 0 12px 34px rgba(30, 40, 60, .16); }
+:root[data-theme="light"] .btn.soon:hover { background: linear-gradient(180deg, rgba(255, 255, 255, .82), rgba(255, 255, 255, .56)); box-shadow: inset 0 1px 0 #fff, 0 8px 28px rgba(30, 40, 60, .1); }
+:root[data-theme="light"] .btn.soon small { background: rgba(0, 0, 0, .06); }
+:root[data-theme="light"] .logo-eth { filter: none; opacity: 1; }
+:root[data-theme="light"] .yt-wrap { box-shadow: 0 34px 80px -24px rgba(30, 40, 60, .35), 0 0 0 1px rgba(0, 0, 0, .06); }
+:root[data-theme="light"] nav.toc a i { background: rgba(0, 0, 0, .07); }
+:root[data-theme="light"] nav.toc a.on { color: #fff; }
+:root[data-theme="light"] nav.toc a.on i { background: #fff; color: #16171b; }
+:root[data-theme="light"] .toc-thumb, :root[data-theme="light"] .seg-thumb { background: linear-gradient(180deg, #2a2c33, #16171b); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18), 0 2px 12px rgba(0, 0, 0, .25); }
+:root[data-theme="light"] .seg button[aria-selected="true"] { color: #fff; }
+:root[data-theme="light"] .toc-toggle b { background: #16171b; color: #fff; }
+@media (max-width: 760px) { :root[data-theme="light"] nav.toc .in { background: rgba(255, 255, 255, .96); } :root[data-theme="light"] nav.toc a.on { background: #16171b; } }
+:root[data-theme="light"] .media, :root[data-theme="light"] .media video { background: #e4e6eb; }
+:root[data-theme="light"] .media { box-shadow: 0 22px 50px -18px rgba(30, 40, 60, .35), 0 0 0 1px rgba(0, 0, 0, .06); }
+@media (hover: hover) { :root[data-theme="light"] .media:hover { box-shadow: 0 30px 60px -18px rgba(30, 40, 60, .42), 0 0 0 1px rgba(0, 0, 0, .08); } }
+:root[data-theme="light"] .round { color: var(--ink); background: rgba(0, 0, 0, .07); box-shadow: inset 0 1px 0 #fff; }
+:root[data-theme="light"] .scrub::-webkit-slider-runnable-track { background: linear-gradient(90deg, rgba(0, 0, 0, .7) var(--p), rgba(0, 0, 0, .12) var(--p)); }
+:root[data-theme="light"] .scrub::-moz-range-track { background: linear-gradient(90deg, rgba(0, 0, 0, .7) var(--p), rgba(0, 0, 0, .12) var(--p)); }
+:root[data-theme="light"] .viewer-frame { background: #f6f6f8; box-shadow: 0 30px 70px -24px rgba(30, 40, 60, .35), 0 0 0 1px rgba(0, 0, 0, .07); }
+:root[data-theme="light"] .appr .joint { background: linear-gradient(180deg, rgba(255, 255, 255, .9), rgba(255, 255, 255, .6)); }
+:root[data-theme="light"] .appr .joint::before { background: linear-gradient(135deg, rgba(201, 138, 11, .7), rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0) 60%, rgba(31, 127, 196, .7)); }
+:root[data-theme="light"] .bib { background: rgba(255, 255, 255, .85); color: #1d1d1f; box-shadow: 0 20px 50px -20px rgba(30, 40, 60, .3), inset 0 0 0 1px rgba(0, 0, 0, .07); }
+:root[data-theme="light"] .copy { color: var(--ink); background: rgba(0, 0, 0, .06); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .06); }
+:root[data-theme="light"] .copy:hover { background: rgba(0, 0, 0, .1); }
+:root[data-theme="light"] .katex [style*="245, 184, 61"] { color: var(--timing) !important; }
+:root[data-theme="light"] .katex [style*="74, 168, 232"] { color: var(--control) !important; }
+:root[data-theme="light"] .lab-logo { box-shadow: 0 14px 34px -14px rgba(30, 40, 60, .3); }
 </style>
-<script>document.documentElement.classList.add('js');</script>
+<script>document.documentElement.classList.add('js');
+  /* day/night: the visitor's own choice if they made one, else their system setting */
+  (function(){ var t = null; try { t = localStorage.getItem('dtmr-theme'); } catch (e) {}
+    if (t === 'light' || (!t && window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches)) document.documentElement.setAttribute('data-theme', 'light'); })();</script>
 </head>
 <body>
+<button class="theme-btn glass" type="button" aria-label="Switch to the day theme" title="Day / night"><svg class="i-moon" viewBox="0 0 24 24"><path class="ic-line" d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="i-sun" viewBox="0 0 24 24"><g class="ic-line"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></g></svg></button>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-chev" viewBox="0 0 16 16"><path class="ic-line" d="M3.5 6l4.5 4.5L12.5 6"/></symbol>
   <symbol id="i-cube" viewBox="0 0 24 24"><g class="ic-line"><path d="M12 2.8l8 4.4v9.6l-8 4.4-8-4.4V7.2z"/><path d="M4 7.2l8 4.4 8-4.4M12 11.6v9.6"/></g></symbol>
@@ -530,6 +589,33 @@ details.explore .lead { margin: 0 0 12px; font-size: 15.5px; }
 <script src="static/katex/katex.min.js"></script>
 <script>
 document.querySelectorAll('.tex').forEach(function(el){ try { katex.render(el.dataset.tex, el, {displayMode: true, throwOnError: false, trust: false}); } catch (e) { el.textContent = el.dataset.tex; } });
+</script>
+<script>
+(function(){
+  /* day/night: follows the system setting until the visitor picks one with the button (then remembered per browser); the viewers follow (iframes not loaded yet get the theme in their URL, loaded ones by message) */
+  var root = document.documentElement, btn = document.querySelector('.theme-btn'), meta = document.querySelector('meta[name="theme-color"]');
+  var isLight = function(){ return root.getAttribute('data-theme') === 'light'; };
+  var tell = function(f){ var w = f.contentWindow; if (w && f.getAttribute('src')) w.postMessage({dtmr: 'theme', dark: !isLight()}, location.origin === 'null' ? '*' : location.origin); };
+  function sync() {
+    var light = isLight();
+    btn.setAttribute('aria-label', light ? 'Switch to the night theme' : 'Switch to the day theme'); meta.setAttribute('content', light ? '#f3f4f7' : '#08080a');
+    document.querySelectorAll('iframe[data-src]').forEach(function(f){ f.dataset.src = f.dataset.src.replace(/([?&])theme=(dark|light)/, '$1theme=' + (light ? 'light' : 'dark')); });
+    document.querySelectorAll('iframe[src]').forEach(tell);
+  }
+  document.querySelectorAll('iframe[data-src]').forEach(function(f){ f.addEventListener('load', function(){ tell(f); }); });
+  btn.addEventListener('click', function(){
+    root.classList.add('theme-anim'); clearTimeout(btn._t); btn._t = setTimeout(function(){ root.classList.remove('theme-anim'); }, 450);
+    if (isLight()) root.removeAttribute('data-theme'); else root.setAttribute('data-theme', 'light');
+    try { localStorage.setItem('dtmr-theme', isLight() ? 'light' : 'dark'); } catch (e) {}
+    sync();
+  });
+  var mq = window.matchMedia && matchMedia('(prefers-color-scheme: light)');
+  if (mq) (mq.addEventListener ? mq.addEventListener.bind(mq, 'change') : mq.addListener.bind(mq))(function(){   // the system switches (e.g. at sunset)
+    var t = null; try { t = localStorage.getItem('dtmr-theme'); } catch (e) {} if (t) return;
+    if (mq.matches) root.setAttribute('data-theme', 'light'); else root.removeAttribute('data-theme'); sync();
+  });
+  sync();
+})();
 </script>
 <script>
 (function(){
