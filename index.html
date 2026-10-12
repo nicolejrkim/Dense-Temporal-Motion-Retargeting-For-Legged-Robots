@@ -224,43 +224,6 @@ h3.subsec { margin-top: 48px; font-size: clamp(20px, 2vw, 24px); font-weight: 70
 .tag i { width: .55em; height: .55em; border-radius: 50%; background: #c8463a; }
 .tag.bad { background: var(--bad-bg); } .tag.good { background: var(--good-bg); } .tag.good i { background: #2e9a5c; }
 @media (max-width: 900px) { .pills b { font-size: 11px; padding: .25em .6em; } .pills span { padding-top: 6px; } }
-/* one transport per group of synced clips (the clips themselves carry no controls) */
-.transport { margin-top: 14px; display: flex; align-items: center; gap: 12px; padding: 6px 16px 6px 6px; }
-.round { width: 40px; height: 40px; flex: none; border-radius: 50%; border: 0; display: grid; place-items: center; color: #fff;
-  background: linear-gradient(180deg, rgba(255, 255, 255, .24), rgba(255, 255, 255, .1)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4); transition: transform .2s; }
-.round:active { transform: scale(.94); }
-.round svg { width: 18px; height: 18px; fill: currentColor; display: none; }
-.round[data-s="play"] .i-play, .round[data-s="pause"] .i-pause, .round[data-s="replay"] .i-replay { display: block; }
-.scrub { flex: 1; min-width: 80px; height: 28px; margin: 0; background: none; cursor: pointer; -webkit-appearance: none; appearance: none; --p: 0%; }
-.scrub::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: linear-gradient(90deg, rgba(255, 255, 255, .8) var(--p), rgba(255, 255, 255, .14) var(--p)); }
-.scrub::-moz-range-track { height: 6px; border-radius: 3px; background: linear-gradient(90deg, rgba(255, 255, 255, .8) var(--p), rgba(255, 255, 255, .14) var(--p)); }
-.scrub::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; margin-top: -5px; border-radius: 50%; background: #fff; box-shadow: 0 2px 8px rgba(0, 0, 0, .4); }
-.scrub::-moz-range-thumb { width: 16px; height: 16px; border: 0; border-radius: 50%; background: #fff; box-shadow: 0 2px 8px rgba(0, 0, 0, .4); }
-.tt { font-size: 13.5px; color: var(--ink2); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.tlabel { font-size: 13px; color: var(--ink3); white-space: nowrap; }
-@media (max-width: 600px) { .tlabel { display: none; } }
-.media video[data-sync], .media video[data-seq] { cursor: pointer; }
-/* a two-step sequence (references, then the rollouts with their reference ghost): the step not playing dims */
-.vcard .media { transition: transform .5s var(--ease), box-shadow .5s var(--ease), filter .6s var(--ease); }
-/* two slots; in each, step 2 (the rollout with its reference ghost) cross-fades over step 1 (the reference) */
-.duo-wrap { max-width: 920px; }
-.duo .media video.ph2 { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity .7s var(--ease); }
-.duo[data-step="2"] .media video.ph2 { opacity: 1; }
-.duo .tag.s2 { opacity: 0; transform: translateY(-4px); transition: opacity .5s var(--ease), transform .5s var(--ease); }
-.duo[data-step="2"] .tag.s2 { opacity: 1; transform: none; }
-.duo .vtitle .s2, .duo[data-step="2"] .vtitle .s1 { display: none; }
-.duo[data-step="2"] .vtitle .s2 { display: inline; animation: rise .5s var(--ease) both; }
-.vcard.wait .media { filter: brightness(.36) saturate(.5); }
-.vcard .vtitle { transition: opacity .6s var(--ease); } .vcard.wait .vtitle { opacity: .5; }
-.stepn, .step i { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; font-size: 11.5px; font-style: normal; font-weight: 700;
-  background: rgba(255, 255, 255, .12); color: var(--ink2); transition: background .4s, color .4s; }
-.stepn { margin-right: .45em; vertical-align: 1px; }
-.vcard:not(.wait) .stepn { background: #fff; color: #111114; }
-.steps { display: inline-flex; gap: 4px; flex: none; }
-.step { display: inline-flex; align-items: center; gap: .45em; border: 0; background: none; padding: 5px 11px 5px 6px; border-radius: 999px;
-  font-size: 13px; font-weight: 600; color: var(--ink3); white-space: nowrap; transition: background .4s, color .4s; }
-.step.on { background: #fff; color: #111114; } .step.on i { background: #111114; color: #fff; }
-@media (max-width: 600px) { .step span, .transport[data-seq] .tt { display: none; } .step { padding: 5px; } }
 /* a wide multi-panel clip scrolls sideways on phones instead of shrinking to a strip */
 .hscroll-hint { display: none; font-size: 13px; color: var(--ink3); }
 @media (max-width: 640px) {
@@ -396,9 +359,6 @@ details.explore .lead { margin: 0 0 12px; font-size: 15.5px; }
 :root[data-theme="light"] .media, :root[data-theme="light"] .media video { background: #e4e6eb; }
 :root[data-theme="light"] .media { box-shadow: 0 22px 50px -18px rgba(30, 40, 60, .35), 0 0 0 1px rgba(0, 0, 0, .06); }
 @media (hover: hover) { :root[data-theme="light"] .media:hover { box-shadow: 0 30px 60px -18px rgba(30, 40, 60, .42), 0 0 0 1px rgba(0, 0, 0, .08); } }
-:root[data-theme="light"] .round { color: var(--ink); background: rgba(0, 0, 0, .07); box-shadow: inset 0 1px 0 #fff; }
-:root[data-theme="light"] .scrub::-webkit-slider-runnable-track { background: linear-gradient(90deg, rgba(0, 0, 0, .7) var(--p), rgba(0, 0, 0, .12) var(--p)); }
-:root[data-theme="light"] .scrub::-moz-range-track { background: linear-gradient(90deg, rgba(0, 0, 0, .7) var(--p), rgba(0, 0, 0, .12) var(--p)); }
 :root[data-theme="light"] .viewer-frame { background: #f6f6f8; box-shadow: 0 30px 70px -24px rgba(30, 40, 60, .35), 0 0 0 1px rgba(0, 0, 0, .07); }
 :root[data-theme="light"] .appr .joint { background: linear-gradient(180deg, rgba(255, 255, 255, .9), rgba(255, 255, 255, .6)); }
 :root[data-theme="light"] .appr .joint::before { background: linear-gradient(135deg, rgba(201, 138, 11, .7), rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0) 60%, rgba(31, 127, 196, .7)); }
@@ -636,121 +596,18 @@ document.querySelectorAll('.tex').forEach(function(el){ try { katex.render(el.da
 <script>
 (function(){
   var vids = document.querySelectorAll('section.section video');
-  /* sync groups (data-sync): the members start together, a finished member holds its last frame, all restart when the longest ends */
-  var groups = {};
-  vids.forEach(function(v){ var g = v.dataset.sync; if (!g) return; (groups[g] = groups[g] || []).push(v);
-    v.addEventListener('ended', function(){ var G = groups[g]; if (!G.hold && G.every(function(x){ return x.ended || x.paused && x.currentTime >= x.duration - 0.05; })) restart(G); });
-    /* any member that starts or stops takes the whole group along (a member's own echo is a no-op); seeking goes through the group's transport */
-    v.addEventListener('play', function(){ groups[g].forEach(function(x){ if (x !== v && x.paused && !x.ended) { if (Math.abs(x.currentTime - v.currentTime) > 0.15) x.currentTime = v.currentTime; x.play().catch(function(){}); } }); });
-    v.addEventListener('pause', function(){ if (v.ended) return; groups[g].forEach(function(x){ if (x !== v && !x.paused) x.pause(); }); });
-  });
-  function restart(G) { G.forEach(function(x){ x.currentTime = 0; }); G.forEach(function(x){ x.play().catch(function(){}); }); }
-  function leadOf(G) { return G.reduce(function(a, x){ return (x.duration || 0) > (a.duration || 0) ? x : a; }); }   // the group's clock: its longest clip
-  function seekAll(G, t) { G.forEach(function(x){ var d = x.duration; x.currentTime = isFinite(d) && d > 0 ? Math.min(t, d - 0.02) : t; }); }
-  function playAll(G) {                                       // from the lead's time; a clip already past its own end holds its last frame
-    var L = leadOf(G); if (L.ended) { restart(G); return; } var t = L.currentTime;
-    G.forEach(function(x){ if (x.preload === 'none') x.preload = 'auto'; var d = x.duration;
-      if (isFinite(d) && t >= d - 0.05) { x.pause(); return; }
-      if (Math.abs(x.currentTime - t) > 0.15) x.currentTime = t; x.play().catch(function(){}); }); }
-  var visible = {};
+  /* clips play while on screen */
   var io = new IntersectionObserver(function(es){ es.forEach(function(e){
-    var v = e.target, g = v.dataset.sync;
-    if (g) { visible[g] = visible[g] || new Set(); if (e.isIntersecting) visible[g].add(v); else visible[g].delete(v);
-      if (visible[g].size) playAll(groups[g]); else groups[g].forEach(function(x){ x.pause(); }); return; }
+    var v = e.target;
     if (v.hasAttribute('data-manual')) { if (!e.isIntersecting) v.pause(); return; }   // played by its own control (the view switch)
     if (e.isIntersecting) { if (v.preload === 'none') v.preload = 'auto'; v.play().catch(function(){}); }
     else v.pause();
   }); }, {threshold: 0.3});
   vids.forEach(function(v){ io.observe(v); });
 
-  /* one transport per group (.transport[data-group]): play / pause / replay, seek and time on the clock of the group's longest clip;
-     a shorter clip holds its last frame past its own end. Clicking any clip of the group toggles it too. */
-  document.querySelectorAll('.transport').forEach(function(tp){
-    var G = groups[tp.dataset.group]; if (!G) return;
-    var btn = tp.querySelector('.round'), sc = tp.querySelector('.scrub'), tt = tp.querySelector('.tt'), drag = false, raf = 0;
-    var lead = function(){ return leadOf(G); };
-    var fmt = function(t){ t = Math.max(0, t || 0); return Math.floor(t / 60) + ':' + (t % 60).toFixed(1).padStart(4, '0'); };
-    var playing = function(){ return G.some(function(x){ return !x.paused && !x.ended; }); };
-    function sync() {
-      var L = lead(), d = L.duration || 0, t = L.ended ? d : L.currentTime, on = playing();
-      var done = !on && d > 0 && G.every(function(x){ return x.ended || x.currentTime >= (x.duration || 0) - 0.05; });
-      btn.dataset.s = on ? 'pause' : (done ? 'replay' : 'play'); btn.setAttribute('aria-label', on ? 'Pause' : (done ? 'Replay' : 'Play'));
-      if (!drag && d) sc.value = Math.round(t / d * 1000);
-      sc.style.setProperty('--p', (sc.value / 10) + '%'); tt.textContent = fmt(t) + ' / ' + fmt(d);
-    }
-    function loop() { sync(); raf = playing() ? requestAnimationFrame(loop) : 0; }
-    function toggle() { if (btn.dataset.s === 'pause') G.forEach(function(x){ x.pause(); }); else if (btn.dataset.s === 'replay') restart(G); else playAll(G); }
-    btn.addEventListener('click', toggle);
-    G.forEach(function(v){
-      v.addEventListener('click', toggle);
-      ['pause', 'ended', 'loadedmetadata', 'seeked'].forEach(function(ev){ v.addEventListener(ev, sync); });
-      v.addEventListener('play', function(){ if (!raf) loop(); });
-    });
-    sc.addEventListener('input', function(){
-      drag = true; G.hold = true; var t = sc.value / 1000 * (lead().duration || 0);   // hold: a seek to a clip's end must not loop the group
-      G.forEach(function(x){ if (x.preload === 'none') x.preload = 'auto'; }); seekAll(G, t); sync();
-    });
-    sc.addEventListener('change', function(){ drag = false; setTimeout(function(){ G.hold = false; }, 300); });
-    sync();
-  });
-
-  /* a two-step sequence (.transport[data-seq]; videos carry data-seq and data-phase 1 / 2): step 1 plays, then step 2 while step 1 holds
-     its last frame, then it loops. One seek bar spans both steps; the step chips jump to a step. Plays while on screen unless paused. */
-  document.querySelectorAll('.transport[data-seq]').forEach(function(tp){
-    var V = Array.prototype.slice.call(document.querySelectorAll('video[data-seq="' + tp.dataset.seq + '"]'));
-    var P = {1: V.filter(function(v){ return v.dataset.phase === '1'; }), 2: V.filter(function(v){ return v.dataset.phase === '2'; })};
-    var btn = tp.querySelector('.round'), sc = tp.querySelector('.scrub'), tt = tp.querySelector('.tt'), steps = Array.prototype.slice.call(tp.querySelectorAll('.step'));
-    var phase = 1, playing = false, userPaused = false, drag = false, hold = false, raf = 0;
-    var fmt = function(t){ t = Math.max(0, t || 0); return Math.floor(t / 60) + ':' + (t % 60).toFixed(1).padStart(4, '0'); };
-    var dur = function(G){ return Math.max.apply(null, G.map(function(x){ return isFinite(x.duration) ? x.duration : 0; })); };
-    var lead = function(G){ return G.reduce(function(a, x){ return (x.duration || 0) > (a.duration || 0) ? x : a; }); };
-    function set(G, t) { G.forEach(function(x){ var d = x.duration; x.currentTime = isFinite(d) && d > 0 ? Math.min(t, d - 0.02) : t; }); }
-    function cards() {
-      var grid = V[0].closest('.vgrid'); if (grid.classList.contains('duo')) grid.dataset.step = String(phase);
-      else V.forEach(function(v){ v.closest('.vcard').classList.toggle('wait', v.dataset.phase !== String(phase)); });
-      steps.forEach(function(st){ st.classList.toggle('on', st.dataset.p === String(phase)); });
-    }
-    function playPhase() {
-      var G = P[phase], t = lead(G).currentTime;
-      G.forEach(function(x){ var d = x.duration; if (isFinite(d) && t >= d - 0.05) return; x.play().catch(function(){}); });
-      P[3 - phase].forEach(function(x){ x.pause(); });
-    }
-    function go(p, t) { phase = p; set(P[p], t || 0); set(P[3 - p], p === 2 ? 1e9 : 0); cards(); if (playing) playPhase(); sync(); }
-    function now() { var L = lead(P[phase]); return (phase === 2 ? dur(P[1]) : 0) + (L.ended ? (L.duration || 0) : L.currentTime); }
-    function sync() {
-      var T = dur(P[1]) + dur(P[2]);
-      btn.dataset.s = playing ? 'pause' : 'play'; btn.setAttribute('aria-label', playing ? 'Pause' : 'Play');
-      if (!drag && T) sc.value = Math.round(now() / T * 1000);
-      sc.style.setProperty('--p', (sc.value / 10) + '%'); tt.textContent = fmt(now()) + ' / ' + fmt(T);
-    }
-    function loop() { sync(); raf = playing ? requestAnimationFrame(loop) : 0; }
-    function play() { V.forEach(function(x){ if (x.preload === 'none') x.preload = 'auto'; }); playing = true; playPhase(); if (!raf) loop(); }
-    function pause() { playing = false; V.forEach(function(x){ x.pause(); }); sync(); }
-    function toggle() { if (playing) { userPaused = true; pause(); } else { userPaused = false; play(); } }
-    V.forEach(function(v){
-      v.addEventListener('click', toggle);
-      v.addEventListener('loadedmetadata', sync);
-      v.addEventListener('ended', function(){                 // the step is over once every clip in it has ended (or holds its end): next step
-        if (!playing || hold || v.dataset.phase !== String(phase)) return;
-        if (P[phase].every(function(x){ return x.ended || x.paused && x.currentTime >= (x.duration || 0) - 0.05; })) go(phase === 1 ? 2 : 1, 0);
-      });
-    });
-    btn.addEventListener('click', toggle);
-    steps.forEach(function(st){ st.addEventListener('click', function(){ go(+st.dataset.p, 0); if (!playing) { userPaused = false; play(); } }); });
-    sc.addEventListener('input', function(){
-      drag = true; hold = true; V.forEach(function(x){ if (x.preload === 'none') x.preload = 'auto'; });
-      var t = sc.value / 1000 * (dur(P[1]) + dur(P[2])), D1 = dur(P[1]);
-      if (t < D1 || !D1) go(1, t); else go(2, t - D1);
-    });
-    sc.addEventListener('change', function(){ drag = false; setTimeout(function(){ hold = false; }, 300); });
-    new IntersectionObserver(function(es){ var on = es.some(function(e){ return e.isIntersecting; });
-      if (on && !playing && !userPaused) play(); else if (!on && playing) pause(); }, {threshold: 0.3}).observe(V[0].closest('.vgrid'));
-    cards(); sync();
-  });
-
   /* the other clips: native controls only while the pointer (or focus) is on the clip, on devices that can hover */
   if (matchMedia('(hover: hover)').matches) vids.forEach(function(v){
-    if (v.dataset.sync || !v.hasAttribute('controls')) return;
+    if (!v.hasAttribute('controls')) return;
     var m = v.closest('.media') || v, on = function(){ v.controls = true; }, off = function(){ if (!m.contains(document.activeElement)) v.controls = false; };
     v.controls = false; v.tabIndex = 0;
     m.addEventListener('mouseenter', on); m.addEventListener('mouseleave', off); m.addEventListener('focusin', on); m.addEventListener('focusout', function(){ setTimeout(off, 0); });
