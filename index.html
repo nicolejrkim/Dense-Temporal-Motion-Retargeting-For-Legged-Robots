@@ -117,6 +117,11 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .cue { position: absolute; left: 50%; bottom: 22px; width: 40px; height: 40px; margin-left: -20px; display: grid; place-items: center; z-index: 2;
   animation: rise 1s .4s var(--ease) both; }
 .cue svg { width: 18px; height: 18px; animation: bob 2.2s ease-in-out infinite; }
+/* back to the site's project list: a pill top-left of the opener at the theme button's height, which scrolls away with the opener like the site's own back button
+   (so it never meets the sticky section nav); the arrow slides on hover as there */
+.back-btn { position: absolute; z-index: 2; top: 12px; left: 16px; height: 40px; min-height: 40px; padding: 0 1.05em 0 .85em; font-size: 14px; }
+.back-btn svg { width: 17px; height: 17px; transition: transform .2s ease; }
+.back-btn:hover svg { transform: translateX(-3px); }
 @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 @keyframes bob { 0%, 100% { transform: translateY(-2px); } 50% { transform: translateY(3px); } }
 .venue { margin-top: 14px; padding: .35em 1em; font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
@@ -390,6 +395,7 @@ details.explore .lead { margin: 0 0 12px; font-size: 15.5px; }
     <span class="venue glass">Venue 2026</span>
     -->
   </div>
+  <a class="btn glass back-btn" href="https://jaeryeongnicolekim.com/projects/"><svg viewBox="0 0 24 24"><g class="ic-line"><path d="M19 12H5M11 18l-6-6 6-6"/></g></svg>All Projects</a>
   <a class="cue glass" href="#top" aria-label="Scroll to the paper"><svg viewBox="0 0 16 16"><use href="#i-chev"/></svg></a>
 </section>
 
